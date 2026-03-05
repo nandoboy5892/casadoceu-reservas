@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Clientes - Casa do Céu</title>
+  <style>
+    body { font-family: Arial, sans-serif; max-width: 800px; margin: 40px auto; padding: 0 20px; }
+    h1 { color: #333; }
+    form { background: #f5f5f5; padding: 20px; border-radius: 8px; margin-bottom: 30px; }
+    label { display: block; margin-bottom: 5px; font-weight: bold; }
+    input { width: 100%; padding: 8px; margin-bottom: 15px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
+    button { background: #4CAF50; color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; }
+    button:hover { background: #45a049; }
+    .btn-sair { background: #999; margin-left: 10px; }
+    table { width: 100%; border-collapse: collapse; }
+    th, td { padding: 10px; border: 1px solid #ddd; text-align: left; }
+    th { background: #4CAF50; color: white; }
+    tr:nth-child(even) { background: #f9f9f9; }
+    #mensagem { color: green; margin-bottom: 10px; }
+  </style>
+</head>
+<body>
+
+  <h1>Clientes - Casa do Céu</h1>
+
+  <p>
+    <a href="/admin/dashboard.html">← Voltar ao Dashboard</a>
+    <button class="btn-sair" id="btnSair">Sair</button>
+  </p>
+
+  <p id="mensagem"></p>
+
+  <!-- Formulário de cadastro -->
+  <form id="formCliente">
+    <h2>Novo Cliente</h2>
+
+    <label>Nome completo</label>
+    <input type="text" id="nome" required>
+
+    <label>Telefone</label>
+    <input type="tel" id="telefone" required>
+
+    <label>E-mail</label>
+    <input type="email" id="emailCliente">
+
+    <label>CPF</label>
+    <input type="text" id="cpf">
+
+    <button type="submit">Salvar Cliente</button>
+  </form>
+
+  <!-- Lista de clientes -->
+  <h2>Clientes Cadastrados</h2>
+  <table>
+    <thead>
+      <tr>
+        <th>Nome</th>
+        <th>Telefone</th>
+        <th>E-mail</th>
+        <th>CPF</th>
+      </tr>
+    </thead>
+    <tbody id="listaClientes">
+      <tr><td colspan="4">Carregando...</td></tr>
+    </tbody>
+  </table>
+
+  <script type="module">
+    import { auth, db } from "../assets/js/firebase.js";
+    import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+    import { collection, addDoc, onSnapshot, orderBy, query } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+    const mensagemEl = document.getElementById('mensagem');
+    const listaEl = document.getElementById('listaClientes');
+    const formEl = document.getElementById('formCliente');
+
+    // Proteger a página
+    onAuthStateChanged(auth, (user) => {
+      if (!user) {
+        window.location.href = "/admin/login.html";
+        return;
+      }
+      carregarClientes();
+    });
+
+    // Sair
+    document.getElementById('btnSair').addEventListener('click', async () => {
+      await signOut(auth);
+      window.location.href = "/admin/login.html";
+    });
+
+    // Salvar novo cliente
+    formEl.addEventListener('submit', async (e) => {
+      e.preventDefault();
+
+      const nome = document.getElementById('nome').value;
+      const telefone = document.getElementById('telefone').value;
+      const emailCliente = document.getElementById('emailCliente').value;
+      const cpf = document.getElementById('cpf').value;
+
+      try {
+        await addDoc(collection(db, 'clientes'), {
+          nome,
+          telefone,
+          email: emailCliente,
+          cpf,
+          criadoEm: new Date()
+        });
+
+        mensagemEl.textContent = 'Cliente salvo com sucesso!';
+        formEl.reset();
+
+        setTimeout(() => { mensagemEl.textContent = ''; }, 3000);
+
+      } catch (error) {
+        console.error(error);
+        mensagemEl.style.color = 'red';
+        mensagemEl.textContent = 'Erro ao salvar cliente.';
+      }
+    });
+
+    // Carregar lista de clientes em tempo real
+    function carregarClientes() {
+      const q = query(collection(db, 'clientes'), orderBy('criadoEm', 'desc'));
+
+      onSnapshot(q, (snapshot) => {
+        if (snapshot.empty) {
+          listaEl.innerHTML = '<tr><td colspan="4">Nenhum cliente cadastrado.</td></tr>';
+          return;
+        }
+
+        listaEl.innerHTML = '';
+        snapshot.forEach((doc) => {
+          const c = doc.data();
+          listaEl.innerHTML += `
+            <tr>
+              <td>${c.nome}</td>
+              <td>${c.telefone}</td>
+              <td>${c.email || '-'}</td>
+              <td>${c.cpf || '-'}</td>
+            </tr>
+          `;
+        });
+      });
+    }
+  </script>
+
+</body>
+</html>
