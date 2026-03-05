@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Dashboard - Casa do Céu</title>
+</head>
+<body>
+  <h1>Dashboard - Casa do Céu</h1>
+
+  <p id="usuario-info"></p>
+
+  <button id="btnLogout">Sair</button>
+
+  <script type="module">
+    import { auth } from "../assets/js/firebase.js";
+    import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+
+    const usuarioInfoEl = document.getElementById('usuario-info');
+    const btnLogout = document.getElementById('btnLogout');
+
+    // 1) Verificar se o usuário está logado
+    onAuthStateChanged(auth, (user) => {
+      if (!user) {
+        // Não está logado → volta para o login
+        window.location.href = "/admin/login.html";
+        return;
+      }
+
+      // Está logado → mostra info básica
+      usuarioInfoEl.textContent = `Você está logado como: ${user.email}`;
+    });
+
+    // 2) Botão de sair
+    btnLogout.addEventListener('click', async () => {
+      await signOut(auth);
+      window.location.href = "/admin/login.html";
+    });
+  </script>
+</body>
+</html>

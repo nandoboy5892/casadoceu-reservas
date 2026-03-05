@@ -6,6 +6,7 @@
 </head>
 <body>
   <h1>Login - Casa do Céu</h1>
+
   <form id="loginForm">
     <label>
       E-mail:
@@ -19,5 +20,39 @@
     <br><br>
     <button type="submit">Entrar</button>
   </form>
+
+  <p id="erro" style="color:red;"></p>
+
+  <script type="module">
+    import { auth } from "../assets/js/firebase.js";
+    import { signInWithEmailAndPassword, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+
+    const form = document.getElementById('loginForm');
+    const erroEl = document.getElementById('erro');
+
+    // Se já estiver logado, vai direto pro dashboard
+    onAuthStateChanged(auth, (user) => {
+      if (user) {
+        window.location.href = "/admin/dashboard.html";
+      }
+    });
+
+    // Ao clicar em Entrar
+    form.addEventListener('submit', async (e) => {
+      e.preventDefault();
+      erroEl.textContent = '';
+
+      const email = document.getElementById('email').value;
+      const senha = document.getElementById('senha').value;
+
+      try {
+        await signInWithEmailAndPassword(auth, email, senha);
+        window.location.href = "/admin/dashboard.html";
+      } catch (error) {
+        console.error(error);
+        erroEl.textContent = 'E-mail ou senha inválidos.';
+      }
+    });
+  </script>
 </body>
 </html>
