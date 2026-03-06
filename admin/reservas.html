@@ -76,8 +76,11 @@
       transition: var(--transition);
     }
 
-    .btn-primary { background: var(--primary); color: var(--white); }
+    .btn-primary  { background: var(--primary); color: var(--white); }
     .btn-primary:hover { background: var(--primary-dark); transform: translateY(-2px); }
+
+    .btn-secondary { background: #6c757d; color: var(--white); }
+    .btn-secondary:hover { background: #565e64; transform: translateY(-2px); }
 
     .btn-outline {
       background: transparent;
@@ -91,6 +94,9 @@
 
     .btn-danger { background: #dc3545; color: var(--white); }
     .btn-danger:hover { background: #b02a37; transform: translateY(-2px); }
+
+    .btn-dark { background: #343a40; color: var(--white); }
+    .btn-dark:hover { background: #23272b; transform: translateY(-2px); }
 
     .btn-sm { padding: 5px 12px; font-size: 0.78rem; }
 
@@ -154,7 +160,8 @@
       gap: 8px;
     }
 
-    /* Layout de duas colunas com overflow controlado */
+    .card-bloqueio h2 { color: #343a40; }
+
     .layout-duas-colunas {
       display: grid;
       grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
@@ -203,8 +210,8 @@
       box-shadow: 0 0 0 3px rgba(0,119,204,0.12);
     }
 
-    textarea { resize: vertical; min-height: 64px; }
-    .form-actions { margin-top: 12px; }
+    textarea { resize: vertical; min-height: 60px; }
+    .form-actions { margin-top: 12px; display: flex; gap: 10px; flex-wrap: wrap; }
 
     #mensagem {
       padding: 10px 16px;
@@ -243,22 +250,10 @@
       flex-wrap: wrap;
     }
 
-    .contador {
-      font-size: 0.82rem;
-      color: var(--gray);
-      font-weight: 600;
-    }
+    .contador { font-size: 0.82rem; color: var(--gray); font-weight: 600; }
 
-    .search-box {
-      position: relative;
-      width: 260px;
-      max-width: 100%;
-    }
-
-    .search-box input {
-      padding-left: 30px;
-    }
-
+    .search-box { position: relative; width: 260px; max-width: 100%; }
+    .search-box input { padding-left: 30px; }
     .search-box i {
       position: absolute;
       left: 9px;
@@ -269,14 +264,9 @@
     }
 
     select { cursor: pointer; }
-
     .table-wrapper { overflow-x: auto; }
 
-    table {
-      width: 100%;
-      border-collapse: collapse;
-      font-size: 0.84rem;
-    }
+    table { width: 100%; border-collapse: collapse; font-size: 0.84rem; }
 
     th {
       background: var(--primary);
@@ -311,6 +301,7 @@
     .status-pendente   { background: #fff3cd; color: #856404; }
     .status-confirmada { background: #d1e7dd; color: #0f5132; }
     .status-cancelada  { background: #f8d7da; color: #842029; }
+    .status-bloqueio   { background: #e2e3e5; color: #343a40; }
 
     .acoes { display: flex; gap: 6px; flex-wrap: wrap; }
 
@@ -327,6 +318,33 @@
       margin-top: 2px;
       font-weight: 600;
     }
+
+    .legenda-cores {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-bottom: 10px;
+      font-size: 0.78rem;
+      font-weight: 600;
+    }
+
+    .legenda-item {
+      display: flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .legenda-dot {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      display: inline-block;
+    }
+
+    .dot-confirmada { background: #34a853; }
+    .dot-pendente   { background: #f9ab00; }
+    .dot-cancelada  { background: #d50000; }
+    .dot-bloqueio   { background: #616161; }
 
     .paginacao {
       display: flex;
@@ -353,13 +371,8 @@
     .paginacao button:hover,
     .paginacao button.ativo { background: var(--primary); color: var(--white); }
     .paginacao button:disabled { opacity: 0.4; cursor: not-allowed; }
+    .paginacao-info { font-size: 0.8rem; color: var(--gray); }
 
-    .paginacao-info {
-      font-size: 0.8rem;
-      color: var(--gray);
-    }
-
-    /* Calendário contido dentro do card sem transbordar */
     .calendario-wrapper {
       border-radius: 10px;
       overflow: hidden;
@@ -382,6 +395,13 @@
       display: flex;
       align-items: flex-start;
       gap: 6px;
+    }
+
+    /* Divisor entre formulários */
+    .divisor {
+      border: none;
+      border-top: 1px dashed #dee2e6;
+      margin: 16px 0;
     }
 
     /* Modal */
@@ -478,78 +498,142 @@
 
   <div class="layout-duas-colunas">
 
-    <!-- FORMULÁRIO -->
-    <div class="card">
-      <h2><i class="fas fa-calendar-plus"></i> Nova Reserva</h2>
-      <form id="formReserva">
-        <div class="form-grid">
+    <!-- COLUNA ESQUERDA: Formulários empilhados -->
+    <div style="display:flex; flex-direction:column; gap:16px;">
 
-          <div class="form-group form-full">
-            <label>Cliente *</label>
-            <select id="clienteId" required>
-              <option value="">Selecione um cliente...</option>
-            </select>
+      <!-- NOVA RESERVA -->
+      <div class="card">
+        <h2><i class="fas fa-calendar-plus"></i> Nova Reserva</h2>
+        <form id="formReserva">
+          <div class="form-grid">
+
+            <div class="form-group form-full">
+              <label>Cliente *</label>
+              <select id="clienteId" required>
+                <option value="">Selecione um cliente...</option>
+              </select>
+            </div>
+
+            <div class="form-group">
+              <label>Data de entrada *</label>
+              <input type="date" id="dataEntrada" required>
+            </div>
+
+            <div class="form-group">
+              <label>Data de saída *</label>
+              <input type="date" id="dataSaida" required>
+            </div>
+
+            <div class="form-group">
+              <label>Horário de chegada</label>
+              <input type="time" id="horaEntrada">
+            </div>
+
+            <div class="form-group">
+              <label>Horário de saída</label>
+              <input type="time" id="horaSaida">
+            </div>
+
+            <div class="form-group">
+              <label>Nº de hóspedes</label>
+              <input type="number" id="hospedes" min="1" placeholder="Ex: 10">
+            </div>
+
+            <div class="form-group">
+              <label>Valor (R$)</label>
+              <input type="number" id="valor" min="0" step="0.01" placeholder="Ex: 1899.90">
+            </div>
+
+            <div class="form-group form-full">
+              <label>Status</label>
+              <select id="status">
+                <option value="pendente">🟡 Pendente</option>
+                <option value="confirmada">🟢 Confirmada</option>
+                <option value="cancelada">🔴 Cancelada</option>
+              </select>
+            </div>
+
+            <div class="form-group form-full">
+              <label>Observações</label>
+              <textarea id="obsReserva" placeholder="Informações adicionais desta reserva..."></textarea>
+            </div>
+
           </div>
-
-          <div class="form-group">
-            <label>Data de entrada *</label>
-            <input type="date" id="dataEntrada" required>
+          <div class="form-actions">
+            <button type="submit" class="btn btn-primary">
+              <i class="fas fa-save"></i> Salvar Reserva
+            </button>
           </div>
+        </form>
+      </div>
 
-          <div class="form-group">
-            <label>Data de saída *</label>
-            <input type="date" id="dataSaida" required>
+      <!-- BLOQUEIO INTERNO -->
+      <div class="card card-bloqueio">
+        <h2><i class="fas fa-ban"></i> Bloqueio Interno de Datas</h2>
+        <p style="font-size:0.8rem;color:var(--gray);margin-bottom:14px;">
+          Use para bloquear datas por manutenção, uso próprio ou qualquer outro motivo sem vínculo com cliente.
+        </p>
+        <form id="formBloqueio">
+          <div class="form-grid">
+
+            <div class="form-group">
+              <label>Data inicial *</label>
+              <input type="date" id="bloqDataInicio" required>
+            </div>
+
+            <div class="form-group">
+              <label>Data final *</label>
+              <input type="date" id="bloqDataFim" required>
+            </div>
+
+            <div class="form-group">
+              <label>Horário de início</label>
+              <input type="time" id="bloqHoraInicio">
+            </div>
+
+            <div class="form-group">
+              <label>Horário de fim</label>
+              <input type="time" id="bloqHoraFim">
+            </div>
+
+            <div class="form-group form-full">
+              <label>Motivo *</label>
+              <input type="text" id="bloqMotivo" placeholder="Ex: Manutenção, Uso próprio, Reforma..." required>
+            </div>
+
           </div>
-
-          <div class="form-group">
-            <label>Horário de chegada</label>
-            <input type="time" id="horaEntrada">
+          <div class="form-actions">
+            <button type="submit" class="btn btn-dark">
+              <i class="fas fa-lock"></i> Bloquear Datas
+            </button>
           </div>
+        </form>
+      </div>
 
-          <div class="form-group">
-            <label>Horário de saída</label>
-            <input type="time" id="horaSaida">
-          </div>
-
-          <div class="form-group">
-            <label>Nº de hóspedes</label>
-            <input type="number" id="hospedes" min="1" placeholder="Ex: 10">
-          </div>
-
-          <div class="form-group">
-            <label>Valor (R$)</label>
-            <input type="number" id="valor" min="0" step="0.01" placeholder="Ex: 1899.90">
-          </div>
-
-          <div class="form-group form-full">
-            <label>Status</label>
-            <select id="status">
-              <option value="pendente">Pendente</option>
-              <option value="confirmada">Confirmada</option>
-              <option value="cancelada">Cancelada</option>
-            </select>
-          </div>
-
-          <div class="form-group form-full">
-            <label>Observações</label>
-            <textarea id="obsReserva" placeholder="Informações adicionais desta reserva..."></textarea>
-          </div>
-
-        </div>
-        <div class="form-actions">
-          <button type="submit" class="btn btn-primary">
-            <i class="fas fa-save"></i> Salvar Reserva
-          </button>
-        </div>
-      </form>
     </div>
 
     <!-- CALENDÁRIO -->
     <div class="card">
       <h2><i class="fas fa-calendar-alt"></i> Calendário de Disponibilidade</h2>
+
+      <div class="legenda-cores">
+        <div class="legenda-item">
+          <span class="legenda-dot dot-confirmada"></span> Confirmada
+        </div>
+        <div class="legenda-item">
+          <span class="legenda-dot dot-pendente"></span> Pendente
+        </div>
+        <div class="legenda-item">
+          <span class="legenda-dot dot-cancelada"></span> Cancelada
+        </div>
+        <div class="legenda-item">
+          <span class="legenda-dot dot-bloqueio"></span> Bloqueio interno
+        </div>
+      </div>
+
       <p class="calendario-info">
         <i class="fas fa-info-circle"></i>
-        As datas em azul já estão reservadas. Ao salvar uma reserva, o calendário é atualizado automaticamente.
+        Ao salvar uma reserva ou bloqueio, o calendário é atualizado automaticamente com a cor correspondente.
       </p>
       <div class="calendario-wrapper">
         <iframe
@@ -565,21 +649,22 @@
 
   <!-- LISTA -->
   <div class="card">
-    <h2><i class="fas fa-calendar-check"></i> Reservas Cadastradas</h2>
+    <h2><i class="fas fa-calendar-check"></i> Reservas e Bloqueios Cadastrados</h2>
 
     <div class="list-toolbar">
       <div class="toolbar-left">
-        <span class="contador" id="contadorReservas">0 reservas</span>
+        <span class="contador" id="contadorReservas">0 registros</span>
         <select id="filtroStatus">
-          <option value="">Todos os status</option>
-          <option value="pendente">Pendente</option>
-          <option value="confirmada">Confirmada</option>
-          <option value="cancelada">Cancelada</option>
+          <option value="">Todos</option>
+          <option value="pendente">🟡 Pendente</option>
+          <option value="confirmada">🟢 Confirmada</option>
+          <option value="cancelada">🔴 Cancelada</option>
+          <option value="bloqueio">⚫ Bloqueio</option>
         </select>
       </div>
       <div class="search-box">
         <i class="fas fa-search"></i>
-        <input type="text" id="busca" placeholder="Buscar por cliente">
+        <input type="text" id="busca" placeholder="Buscar por cliente ou motivo">
       </div>
     </div>
 
@@ -587,7 +672,7 @@
       <table>
         <thead>
           <tr>
-            <th>Cliente</th>
+            <th>Cliente / Motivo</th>
             <th>Entrada</th>
             <th>Saída</th>
             <th>Hóspedes</th>
@@ -607,7 +692,7 @@
 
 </div>
 
-<!-- Modal edição -->
+<!-- Modal edição reserva -->
 <div class="modal-overlay" id="modalOverlay">
   <div class="modal">
     <h2><i class="fas fa-calendar-alt"></i> Editar Reserva</h2>
@@ -651,9 +736,9 @@
       <div class="form-group form-full">
         <label>Status</label>
         <select id="editStatus">
-          <option value="pendente">Pendente</option>
-          <option value="confirmada">Confirmada</option>
-          <option value="cancelada">Cancelada</option>
+          <option value="pendente">🟡 Pendente</option>
+          <option value="confirmada">🟢 Confirmada</option>
+          <option value="cancelada">🔴 Cancelada</option>
         </select>
       </div>
 
@@ -672,6 +757,47 @@
   </div>
 </div>
 
+<!-- Modal edição bloqueio -->
+<div class="modal-overlay" id="modalBloqueioOverlay">
+  <div class="modal">
+    <h2><i class="fas fa-ban"></i> Editar Bloqueio</h2>
+    <div class="form-grid">
+
+      <div class="form-group">
+        <label>Data inicial *</label>
+        <input type="date" id="editBloqDataInicio">
+      </div>
+
+      <div class="form-group">
+        <label>Data final *</label>
+        <input type="date" id="editBloqDataFim">
+      </div>
+
+      <div class="form-group">
+        <label>Horário de início</label>
+        <input type="time" id="editBloqHoraInicio">
+      </div>
+
+      <div class="form-group">
+        <label>Horário de fim</label>
+        <input type="time" id="editBloqHoraFim">
+      </div>
+
+      <div class="form-group form-full">
+        <label>Motivo *</label>
+        <input type="text" id="editBloqMotivo">
+      </div>
+
+    </div>
+    <div class="modal-botoes">
+      <button class="btn btn-outline" id="btnCancelarBloqueio">Cancelar</button>
+      <button class="btn btn-dark" id="btnSalvarBloqueio">
+        <i class="fas fa-save"></i> Salvar alterações
+      </button>
+    </div>
+  </div>
+</div>
+
 <script type="module">
   import { auth, db } from "../assets/js/firebase.js";
   import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
@@ -680,20 +806,23 @@
     doc, deleteDoc, getDocs, updateDoc
   } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-  const mensagemEl       = document.getElementById('mensagem');
-  const formReserva      = document.getElementById('formReserva');
-  const clienteSelect    = document.getElementById('clienteId');
-  const listaEl          = document.getElementById('listaReservas');
-  const contadorEl       = document.getElementById('contadorReservas');
-  const buscaEl          = document.getElementById('busca');
-  const filtroStatus     = document.getElementById('filtroStatus');
-  const paginacaoEl      = document.getElementById('paginacao');
-  const modalOverlay     = document.getElementById('modalOverlay');
-  const iframeCalendario = document.getElementById('iframeCalendario');
+  const mensagemEl           = document.getElementById('mensagem');
+  const formReserva          = document.getElementById('formReserva');
+  const formBloqueio         = document.getElementById('formBloqueio');
+  const clienteSelect        = document.getElementById('clienteId');
+  const listaEl              = document.getElementById('listaReservas');
+  const contadorEl           = document.getElementById('contadorReservas');
+  const buscaEl              = document.getElementById('busca');
+  const filtroStatus         = document.getElementById('filtroStatus');
+  const paginacaoEl          = document.getElementById('paginacao');
+  const modalOverlay         = document.getElementById('modalOverlay');
+  const modalBloqueioOverlay = document.getElementById('modalBloqueioOverlay');
+  const iframeCalendario     = document.getElementById('iframeCalendario');
 
   let reservas          = [];
   let clientesPorId     = {};
   let reservaEditandoId = null;
+  let bloqueioEditandoId = null;
   const POR_PAGINA      = 10;
   let paginaAtual       = 1;
 
@@ -794,15 +923,15 @@
     const status      = document.getElementById('status').value;
     const obs         = document.getElementById('obsReserva').value.trim();
 
-    if (!clienteId)              { mostrarMensagem('Selecione um cliente.', 'erro'); return; }
-    if (!dataEntrada || !dataSaida) { mostrarMensagem('Preencha as datas.', 'erro'); return; }
-    if (dataSaida < dataEntrada) { mostrarMensagem('A data de saída não pode ser anterior à entrada.', 'erro'); return; }
+    if (!clienteId)                { mostrarMensagem('Selecione um cliente.', 'erro'); return; }
+    if (!dataEntrada || !dataSaida){ mostrarMensagem('Preencha as datas.', 'erro'); return; }
+    if (dataSaida < dataEntrada)   { mostrarMensagem('A data de saída não pode ser anterior à entrada.', 'erro'); return; }
 
     try {
       const nomeCliente = (clientesPorId[clienteId] || {}).nome || 'Cliente';
 
-      // 1) Salva no Firestore
       const docRef = await addDoc(collection(db, 'reservas'), {
+        tipo: 'reserva',
         clienteId,
         dataEntrada,
         dataSaida,
@@ -815,9 +944,9 @@
         criadoEm:    new Date(),
       });
 
-      // 2) Cria evento no Google Calendar
       const result = await chamarCalendario({
         acao:        'criar',
+        status,
         titulo:      `Reserva – ${nomeCliente} (${hospedes || '?'} hóspedes)`,
         dataEntrada,
         dataSaida,
@@ -841,7 +970,58 @@
     }
   });
 
-  // ── Carregar reservas (tempo real) ──
+  // ── Salvar bloqueio interno ──
+  formBloqueio.addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    const dataInicio  = document.getElementById('bloqDataInicio').value;
+    const dataFim     = document.getElementById('bloqDataFim').value;
+    const horaInicio  = document.getElementById('bloqHoraInicio').value || null;
+    const horaFim     = document.getElementById('bloqHoraFim').value    || null;
+    const motivo      = document.getElementById('bloqMotivo').value.trim();
+
+    if (!dataInicio || !dataFim) { mostrarMensagem('Preencha as datas do bloqueio.', 'erro'); return; }
+    if (dataFim < dataInicio)    { mostrarMensagem('A data final não pode ser anterior à inicial.', 'erro'); return; }
+    if (!motivo)                 { mostrarMensagem('Informe o motivo do bloqueio.', 'erro'); return; }
+
+    try {
+      const docRef = await addDoc(collection(db, 'reservas'), {
+        tipo:       'bloqueio',
+        dataEntrada: dataInicio,
+        dataSaida:   dataFim,
+        horaEntrada: horaInicio,
+        horaSaida:   horaFim,
+        motivo,
+        status:     'bloqueio',
+        criadoEm:   new Date(),
+      });
+
+      const result = await chamarCalendario({
+        acao:        'criar',
+        status:      'bloqueio',
+        titulo:      `🔒 Bloqueio – ${motivo}`,
+        dataEntrada:  dataInicio,
+        dataSaida:    dataFim,
+        horaEntrada:  horaInicio,
+        horaSaida:    horaFim,
+        descricao:   `Bloqueio interno\nMotivo: ${motivo}`,
+      });
+
+      if (result.eventId) {
+        await updateDoc(doc(db, 'reservas', docRef.id), { googleEventId: result.eventId });
+      }
+
+      mostrarMensagem('Datas bloqueadas com sucesso!');
+      formBloqueio.reset();
+      recarregarCalendario();
+
+    } catch (error) {
+      console.error("Erro ao salvar bloqueio:", error);
+      mostrarMensagem('Erro ao salvar bloqueio.', 'erro');
+    }
+  });
+
+  // ── Carregar reservas + bloqueios (tempo real) ──
   function carregarReservas() {
     const q = query(collection(db, 'reservas'), orderBy('criadoEm', 'desc'));
     onSnapshot(q, (snapshot) => {
@@ -866,43 +1046,49 @@
     const status = filtroStatus.value;
 
     const lista = reservas.filter((r) => {
-      const nome       = ((clientesPorId[r.clienteId] || {}).nome || '').toLowerCase();
+      const nome    = r.tipo === 'bloqueio'
+        ? (r.motivo || '').toLowerCase()
+        : ((clientesPorId[r.clienteId] || {}).nome || '').toLowerCase();
       const matchBusca = !termo  || nome.includes(termo);
       const matchSt    = !status || r.status === status;
       return matchBusca && matchSt;
     });
 
-    contadorEl.textContent = lista.length + (lista.length === 1 ? ' reserva' : ' reservas');
+    contadorEl.textContent = lista.length + (lista.length === 1 ? ' registro' : ' registros');
 
     const inicio = (paginaAtual - 1) * POR_PAGINA;
     const pagina = lista.slice(inicio, inicio + POR_PAGINA);
 
     if (!pagina.length) {
-      listaEl.innerHTML = `<tr><td colspan="7" style="color:var(--gray);text-align:center;padding:20px;">Nenhuma reserva encontrada.</td></tr>`;
+      listaEl.innerHTML = `<tr><td colspan="7" style="color:var(--gray);text-align:center;padding:20px;">Nenhum registro encontrado.</td></tr>`;
       paginacaoEl.innerHTML = '';
       return;
     }
 
     const statusMap = {
-      pendente:   { cls: 'status-pendente',   label: 'Pendente'   },
-      confirmada: { cls: 'status-confirmada', label: 'Confirmada' },
-      cancelada:  { cls: 'status-cancelada',  label: 'Cancelada'  },
+      pendente:   { cls: 'status-pendente',   label: '🟡 Pendente'   },
+      confirmada: { cls: 'status-confirmada', label: '🟢 Confirmada' },
+      cancelada:  { cls: 'status-cancelada',  label: '🔴 Cancelada'  },
+      bloqueio:   { cls: 'status-bloqueio',   label: '⚫ Bloqueio'   },
     };
 
     listaEl.innerHTML = '';
     pagina.forEach((r) => {
-      const nome  = (clientesPorId[r.clienteId] || {}).nome || '(cliente removido)';
+      const isBloqueio = r.tipo === 'bloqueio';
+      const nome = isBloqueio
+        ? `<i class="fas fa-ban" style="color:#343a40;margin-right:4px;"></i><strong>${r.motivo || 'Bloqueio'}</strong>`
+        : `<strong>${(clientesPorId[r.clienteId] || {}).nome || '(cliente removido)'}</strong>` +
+          (r.observacoes ? `<div class="obs-texto"><i class="fas fa-sticky-note"></i> ${r.observacoes}</div>` : '');
+
       const valor = r.valor != null
         ? `R$ ${Number(r.valor).toFixed(2).replace('.', ',')}`
         : '-';
+
       const st = statusMap[r.status] || statusMap['pendente'];
 
       listaEl.innerHTML += `
         <tr>
-          <td>
-            <strong>${nome}</strong>
-            ${r.observacoes ? `<div class="obs-texto"><i class="fas fa-sticky-note"></i> ${r.observacoes}</div>` : ''}
-          </td>
+          <td>${nome}</td>
           <td>
             ${formatarData(r.dataEntrada)}
             ${r.horaEntrada ? `<div class="horario-texto"><i class="fas fa-clock"></i> ${r.horaEntrada}</div>` : ''}
@@ -911,16 +1097,15 @@
             ${formatarData(r.dataSaida)}
             ${r.horaSaida ? `<div class="horario-texto"><i class="fas fa-clock"></i> ${r.horaSaida}</div>` : ''}
           </td>
-          <td>${r.hospedes || '-'}</td>
-          <td>${valor}</td>
+          <td>${isBloqueio ? '-' : (r.hospedes || '-')}</td>
+          <td>${isBloqueio ? '-' : valor}</td>
           <td>
-            <span class="status-badge ${st.cls}">
-              <i class="fas fa-circle" style="font-size:0.45rem"></i> ${st.label}
-            </span>
+            <span class="status-badge ${st.cls}">${st.label}</span>
           </td>
           <td>
             <div class="acoes">
-              <button class="btn btn-warning btn-sm" onclick="abrirEdicao('${r.id}')">
+              <button class="btn ${isBloqueio ? 'btn-secondary' : 'btn-warning'} btn-sm"
+                onclick="${isBloqueio ? `abrirEdicaoBloqueio('${r.id}')` : `abrirEdicao('${r.id}')`}">
                 <i class="fas fa-edit"></i>
               </button>
               <button class="btn btn-danger btn-sm" onclick="excluirReserva('${r.id}')">
@@ -1002,30 +1187,21 @@
     const observacoes = document.getElementById('editObs').value.trim();
 
     try {
-      // 1) Atualiza Firestore
       await updateDoc(doc(db, 'reservas', reservaEditandoId), {
-        clienteId,
-        dataEntrada,
-        dataSaida,
-        horaEntrada,
-        horaSaida,
+        clienteId, dataEntrada, dataSaida, horaEntrada, horaSaida,
         hospedes:    hospedes ? Number(hospedes) : null,
         valor:       valor    ? Number(valor)    : null,
-        status,
-        observacoes,
+        status, observacoes,
       });
 
-      // 2) Atualiza evento no Google Calendar
       if (reservaOriginal && reservaOriginal.googleEventId) {
         const nomeCliente = (clientesPorId[clienteId] || {}).nome || 'Cliente';
         await chamarCalendario({
           acao:        'atualizar',
           eventId:     reservaOriginal.googleEventId,
+          status,
           titulo:      `Reserva – ${nomeCliente} (${hospedes || '?'} hóspedes)`,
-          dataEntrada,
-          dataSaida,
-          horaEntrada,
-          horaSaida,
+          dataEntrada, dataSaida, horaEntrada, horaSaida,
           descricao:   montarDescricao(nomeCliente, hospedes, valor, status, horaEntrada, horaSaida, observacoes),
         });
       }
@@ -1041,17 +1217,77 @@
     }
   });
 
-  // ── Excluir reserva ──
+  // ── Editar bloqueio ──
+  window.abrirEdicaoBloqueio = (id) => {
+    const r = reservas.find(x => x.id === id);
+    if (!r) return;
+    bloqueioEditandoId = id;
+    document.getElementById('editBloqDataInicio').value  = r.dataEntrada  || '';
+    document.getElementById('editBloqDataFim').value     = r.dataSaida    || '';
+    document.getElementById('editBloqHoraInicio').value  = r.horaEntrada  || '';
+    document.getElementById('editBloqHoraFim').value     = r.horaSaida    || '';
+    document.getElementById('editBloqMotivo').value      = r.motivo       || '';
+    modalBloqueioOverlay.classList.add('ativo');
+  };
+
+  document.getElementById('btnCancelarBloqueio').addEventListener('click', () => {
+    modalBloqueioOverlay.classList.remove('ativo');
+    bloqueioEditandoId = null;
+  });
+
+  document.getElementById('btnSalvarBloqueio').addEventListener('click', async () => {
+    if (!bloqueioEditandoId) return;
+
+    const original    = reservas.find(r => r.id === bloqueioEditandoId);
+    const dataInicio  = document.getElementById('editBloqDataInicio').value;
+    const dataFim     = document.getElementById('editBloqDataFim').value;
+    const horaInicio  = document.getElementById('editBloqHoraInicio').value || null;
+    const horaFim     = document.getElementById('editBloqHoraFim').value    || null;
+    const motivo      = document.getElementById('editBloqMotivo').value.trim();
+
+    try {
+      await updateDoc(doc(db, 'reservas', bloqueioEditandoId), {
+        dataEntrada: dataInicio,
+        dataSaida:   dataFim,
+        horaEntrada: horaInicio,
+        horaSaida:   horaFim,
+        motivo,
+      });
+
+      if (original && original.googleEventId) {
+        await chamarCalendario({
+          acao:        'atualizar',
+          eventId:     original.googleEventId,
+          status:      'bloqueio',
+          titulo:      `🔒 Bloqueio – ${motivo}`,
+          dataEntrada:  dataInicio,
+          dataSaida:    dataFim,
+          horaEntrada:  horaInicio,
+          horaSaida:    horaFim,
+          descricao:   `Bloqueio interno\nMotivo: ${motivo}`,
+        });
+      }
+
+      mostrarMensagem('Bloqueio atualizado com sucesso!');
+      modalBloqueioOverlay.classList.remove('ativo');
+      bloqueioEditandoId = null;
+      recarregarCalendario();
+
+    } catch (error) {
+      console.error("Erro ao editar bloqueio:", error);
+      mostrarMensagem('Erro ao atualizar bloqueio.', 'erro');
+    }
+  });
+
+  // ── Excluir reserva ou bloqueio ──
   window.excluirReserva = async (id) => {
-    if (!confirm('Tem certeza que deseja excluir esta reserva?')) return;
+    if (!confirm('Tem certeza que deseja excluir este registro?')) return;
 
     const reserva = reservas.find(r => r.id === id);
 
     try {
-      // 1) Exclui do Firestore
       await deleteDoc(doc(db, 'reservas', id));
 
-      // 2) Exclui do Google Calendar
       if (reserva && reserva.googleEventId) {
         await chamarCalendario({
           acao:    'excluir',
@@ -1059,12 +1295,12 @@
         });
       }
 
-      mostrarMensagem('Reserva excluída com sucesso!');
+      mostrarMensagem('Registro excluído com sucesso!');
       recarregarCalendario();
 
     } catch (error) {
-      console.error("Erro ao excluir reserva:", error);
-      mostrarMensagem('Erro ao excluir reserva.', 'erro');
+      console.error("Erro ao excluir:", error);
+      mostrarMensagem('Erro ao excluir registro.', 'erro');
     }
   };
 </script>
