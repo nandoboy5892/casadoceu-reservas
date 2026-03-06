@@ -1,0 +1,24 @@
+{
+  "name": "casadoceu-reservas",
+  "version": "1.0.0",
+  "description": "",
+  "main": "package.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/nandoboy5892/casadoceu-reservas.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/nandoboy5892/casadoceu-reservas/issues"
+  },
+  "homepage": "https://github.com/nandoboy5892/casadoceu-reservas#readme",
+  "dependencies": {
+    "googleapis": "^171.4.0"
+  }
+}
