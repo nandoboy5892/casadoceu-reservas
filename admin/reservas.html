@@ -154,15 +154,19 @@
       gap: 8px;
     }
 
+    /* Layout de duas colunas com overflow controlado */
     .layout-duas-colunas {
       display: grid;
-      grid-template-columns: minmax(0, 1.05fr) minmax(0, 1.1fr);
+      grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
       gap: 16px;
       margin-bottom: 20px;
+      align-items: start;
     }
 
     .layout-duas-colunas .card {
       margin-bottom: 0;
+      min-width: 0;
+      overflow: hidden;
     }
 
     .form-grid {
@@ -190,6 +194,7 @@
       color: var(--dark);
       transition: var(--transition);
       outline: none;
+      width: 100%;
     }
 
     input:focus, textarea:focus, select:focus {
@@ -251,7 +256,6 @@
     }
 
     .search-box input {
-      width: 100%;
       padding-left: 30px;
     }
 
@@ -317,6 +321,13 @@
       font-style: italic;
     }
 
+    .horario-texto {
+      font-size: 0.76rem;
+      color: var(--primary);
+      margin-top: 2px;
+      font-weight: 600;
+    }
+
     .paginacao {
       display: flex;
       justify-content: center;
@@ -348,11 +359,13 @@
       color: var(--gray);
     }
 
+    /* Calendário contido dentro do card sem transbordar */
     .calendario-wrapper {
       border-radius: 10px;
       overflow: hidden;
       border: 1px solid #dee2e6;
-      height: 460px; /* altura fixa pra alinhar melhor */
+      width: 100%;
+      height: 460px;
     }
 
     .calendario-wrapper iframe {
@@ -367,7 +380,7 @@
       color: var(--gray);
       margin-bottom: 8px;
       display: flex;
-      align-items: center;
+      align-items: flex-start;
       gap: 6px;
     }
 
@@ -421,18 +434,16 @@
     }
 
     @media (max-width: 900px) {
-      .layout-duas-colunas {
-        grid-template-columns: 1fr;
-      }
+      .layout-duas-colunas { grid-template-columns: 1fr; }
+      .calendario-wrapper  { height: 400px; }
     }
 
     @media (max-width: 700px) {
-      .form-grid { grid-template-columns: 1fr; }
-      nav { padding: 1rem; }
-      .container { padding: 24px 12px 32px; }
+      .form-grid  { grid-template-columns: 1fr; }
+      nav         { padding: 1rem; }
+      .container  { padding: 20px 12px 32px; }
       .search-box { width: 100%; }
       .list-toolbar { flex-direction: column; align-items: flex-start; }
-      .calendario-wrapper { height: 420px; }
     }
   </style>
 </head>
@@ -465,10 +476,9 @@
 
   <div id="mensagem"></div>
 
-  <!-- FORMULÁRIO + CALENDÁRIO LADO A LADO -->
   <div class="layout-duas-colunas">
 
-    <!-- NOVA RESERVA -->
+    <!-- FORMULÁRIO -->
     <div class="card">
       <h2><i class="fas fa-calendar-plus"></i> Nova Reserva</h2>
       <form id="formReserva">
@@ -534,12 +544,12 @@
       </form>
     </div>
 
-    <!-- CALENDÁRIO GOOGLE -->
+    <!-- CALENDÁRIO -->
     <div class="card">
       <h2><i class="fas fa-calendar-alt"></i> Calendário de Disponibilidade</h2>
       <p class="calendario-info">
         <i class="fas fa-info-circle"></i>
-        As datas em azul já estão reservadas. Ao salvar uma reserva, o calendário é atualizado.
+        As datas em azul já estão reservadas. Ao salvar uma reserva, o calendário é atualizado automaticamente.
       </p>
       <div class="calendario-wrapper">
         <iframe
@@ -670,15 +680,15 @@
     doc, deleteDoc, getDocs, updateDoc
   } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-  const mensagemEl    = document.getElementById('mensagem');
-  const formReserva   = document.getElementById('formReserva');
-  const clienteSelect = document.getElementById('clienteId');
-  const listaEl       = document.getElementById('listaReservas');
-  const contadorEl    = document.getElementById('contadorReservas');
-  const buscaEl       = document.getElementById('busca');
-  const filtroStatus  = document.getElementById('filtroStatus');
-  const paginacaoEl   = document.getElementById('paginacao');
-  const modalOverlay  = document.getElementById('modalOverlay');
+  const mensagemEl       = document.getElementById('mensagem');
+  const formReserva      = document.getElementById('formReserva');
+  const clienteSelect    = document.getElementById('clienteId');
+  const listaEl          = document.getElementById('listaReservas');
+  const contadorEl       = document.getElementById('contadorReservas');
+  const buscaEl          = document.getElementById('busca');
+  const filtroStatus     = document.getElementById('filtroStatus');
+  const paginacaoEl      = document.getElementById('paginacao');
+  const modalOverlay     = document.getElementById('modalOverlay');
   const iframeCalendario = document.getElementById('iframeCalendario');
 
   let reservas          = [];
@@ -687,12 +697,9 @@
   const POR_PAGINA      = 10;
   let paginaAtual       = 1;
 
-  // Protege página
+  // ── Auth ──
   onAuthStateChanged(auth, async (user) => {
-    if (!user) {
-      window.location.href = "/admin/login.html";
-      return;
-    }
+    if (!user) { window.location.href = "/admin/login.html"; return; }
     document.getElementById('usuarioLogado').textContent = user.email;
     await carregarClientes();
     carregarReservas();
@@ -703,9 +710,10 @@
     window.location.href = "/admin/login.html";
   });
 
+  // ── Helpers ──
   function mostrarMensagem(texto, tipo = 'sucesso') {
     mensagemEl.textContent = texto;
-    mensagemEl.className = tipo;
+    mensagemEl.className   = tipo;
     setTimeout(() => { mensagemEl.className = ''; mensagemEl.textContent = ''; }, 4000);
   }
 
@@ -715,104 +723,115 @@
     setTimeout(() => { iframeCalendario.src = src; }, 400);
   }
 
-  // Carregar clientes
+  function formatarData(valor) {
+    if (!valor) return '-';
+    const [ano, mes, dia] = valor.split('-');
+    if (!ano || !mes || !dia) return valor;
+    return `${dia}/${mes}/${ano}`;
+  }
+
+  function montarDescricao(nomeCliente, hospedes, valor, status, horaEntrada, horaSaida, obs) {
+    return (
+      `Cliente: ${nomeCliente}\n` +
+      `Hóspedes: ${hospedes || '-'}\n` +
+      `Valor: ${valor ? 'R$ ' + valor : '-'}\n` +
+      `Status: ${status}\n` +
+      (horaEntrada ? `Chegada: ${horaEntrada}\n` : '') +
+      (horaSaida   ? `Saída: ${horaSaida}\n`     : '') +
+      (obs         ? `Obs: ${obs}`               : '')
+    );
+  }
+
+  async function chamarCalendario(payload) {
+    try {
+      const resp = await fetch('/.netlify/functions/evento-calendario', {
+        method:  'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body:    JSON.stringify(payload),
+      });
+      return await resp.json();
+    } catch (err) {
+      console.warn('Erro ao chamar evento-calendario:', err);
+      return {};
+    }
+  }
+
+  // ── Carregar clientes ──
   async function carregarClientes() {
     try {
       const snap = await getDocs(collection(db, 'clientes'));
       clientesPorId = {};
-      const options     = ['<option value="">Selecione um cliente...</option>'];
-      const optionsEdit = ['<option value="">Selecione um cliente...</option>'];
+      const opts     = ['<option value="">Selecione um cliente...</option>'];
+      const optsEdit = ['<option value="">Selecione um cliente...</option>'];
 
       snap.forEach((docSnap) => {
         const c    = docSnap.data();
         clientesPorId[docSnap.id] = c;
         const nome = c.nome || '(sem nome)';
-        options.push(`<option value="${docSnap.id}">${nome}</option>`);
-        optionsEdit.push(`<option value="${docSnap.id}">${nome}</option>`);
+        opts.push(`<option value="${docSnap.id}">${nome}</option>`);
+        optsEdit.push(`<option value="${docSnap.id}">${nome}</option>`);
       });
 
-      clienteSelect.innerHTML = options.join('');
-      document.getElementById('editClienteId').innerHTML = optionsEdit.join('');
+      clienteSelect.innerHTML = opts.join('');
+      document.getElementById('editClienteId').innerHTML = optsEdit.join('');
     } catch (erro) {
       console.error("Erro ao carregar clientes:", erro);
-      clienteSelect.innerHTML = '<option value="">Erro ao carregar clientes</option>';
       mostrarMensagem("Erro ao carregar clientes.", "erro");
     }
   }
 
-  // Salvar nova reserva + Google Calendar
+  // ── Salvar nova reserva ──
   formReserva.addEventListener('submit', async (e) => {
     e.preventDefault();
 
     const clienteId   = clienteSelect.value;
     const dataEntrada = document.getElementById('dataEntrada').value;
     const dataSaida   = document.getElementById('dataSaida').value;
-    const horaEntrada = document.getElementById('horaEntrada').value;
-    const horaSaida   = document.getElementById('horaSaida').value;
+    const horaEntrada = document.getElementById('horaEntrada').value || null;
+    const horaSaida   = document.getElementById('horaSaida').value   || null;
     const hospedes    = document.getElementById('hospedes').value;
     const valor       = document.getElementById('valor').value;
     const status      = document.getElementById('status').value;
     const obs         = document.getElementById('obsReserva').value.trim();
 
-    if (!clienteId) { mostrarMensagem('Selecione um cliente.', 'erro'); return; }
+    if (!clienteId)              { mostrarMensagem('Selecione um cliente.', 'erro'); return; }
     if (!dataEntrada || !dataSaida) { mostrarMensagem('Preencha as datas.', 'erro'); return; }
     if (dataSaida < dataEntrada) { mostrarMensagem('A data de saída não pode ser anterior à entrada.', 'erro'); return; }
 
     try {
-      const cliente     = clientesPorId[clienteId] || {};
-      const nomeCliente = cliente.nome || 'Cliente';
+      const nomeCliente = (clientesPorId[clienteId] || {}).nome || 'Cliente';
 
-      // Salva no Firestore
+      // 1) Salva no Firestore
       const docRef = await addDoc(collection(db, 'reservas'), {
         clienteId,
         dataEntrada,
         dataSaida,
-        horaEntrada: horaEntrada || null,
-        horaSaida:   horaSaida   || null,
+        horaEntrada,
+        horaSaida,
         hospedes:    hospedes ? Number(hospedes) : null,
         valor:       valor    ? Number(valor)    : null,
         status,
         observacoes: obs,
-        criadoEm:    new Date()
+        criadoEm:    new Date(),
       });
 
-      // Cria evento no Google Calendar (com horário se informado)
-      try {
-        const corpoEvento = {
-          titulo:    `Reserva – ${nomeCliente}`,
-          dataEntrada,
-          dataSaida,
-          horaEntrada: horaEntrada || null,
-          horaSaida:   horaSaida   || null,
-          descricao:
-            `Cliente: ${nomeCliente}\n` +
-            `Hóspedes: ${hospedes || '-'}\n` +
-            `Valor: ${valor ? 'R$ ' + valor : '-'}\n` +
-            `Status: ${status}\n` +
-            (horaEntrada ? `Chegada: ${horaEntrada}\n` : '') +
-            (horaSaida   ? `Saída: ${horaSaida}\n` : '') +
-            (obs ? `Obs: ${obs}` : '')
-        };
+      // 2) Cria evento no Google Calendar
+      const result = await chamarCalendario({
+        acao:        'criar',
+        titulo:      `Reserva – ${nomeCliente} (${hospedes || '?'} hóspedes)`,
+        dataEntrada,
+        dataSaida,
+        horaEntrada,
+        horaSaida,
+        descricao:   montarDescricao(nomeCliente, hospedes, valor, status, horaEntrada, horaSaida, obs),
+      });
 
-        const resp = await fetch('/.netlify/functions/criar-evento', {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify(corpoEvento)
-        });
-
-        const result = await resp.json();
-        if (result.eventId) {
-          await updateDoc(doc(db, 'reservas', docRef.id), {
-            googleEventId: result.eventId
-          });
-        }
-      } catch (errCal) {
-        console.warn('Reserva salva, mas erro ao criar evento no Google Calendar:', errCal);
+      if (result.eventId) {
+        await updateDoc(doc(db, 'reservas', docRef.id), { googleEventId: result.eventId });
       }
 
       mostrarMensagem('Reserva salva e agenda atualizada!');
       formReserva.reset();
-      clienteSelect.value = '';
       paginaAtual = 1;
       recarregarCalendario();
 
@@ -822,7 +841,7 @@
     }
   });
 
-  // Carregar reservas em tempo real
+  // ── Carregar reservas (tempo real) ──
   function carregarReservas() {
     const q = query(collection(db, 'reservas'), orderBy('criadoEm', 'desc'));
     onSnapshot(q, (snapshot) => {
@@ -841,16 +860,16 @@
   buscaEl.addEventListener('input',       () => { paginaAtual = 1; renderizar(); });
   filtroStatus.addEventListener('change', () => { paginaAtual = 1; renderizar(); });
 
+  // ── Renderizar tabela ──
   function renderizar() {
     const termo  = buscaEl.value.trim().toLowerCase();
     const status = filtroStatus.value;
 
-    let lista = reservas.filter((r) => {
-      const cliente     = clientesPorId[r.clienteId] || {};
-      const nome        = (cliente.nome || '').toLowerCase();
-      const matchBusca  = !termo  || nome.includes(termo);
-      const matchStatus = !status || r.status === status;
-      return matchBusca && matchStatus;
+    const lista = reservas.filter((r) => {
+      const nome       = ((clientesPorId[r.clienteId] || {}).nome || '').toLowerCase();
+      const matchBusca = !termo  || nome.includes(termo);
+      const matchSt    = !status || r.status === status;
+      return matchBusca && matchSt;
     });
 
     contadorEl.textContent = lista.length + (lista.length === 1 ? ' reserva' : ' reservas');
@@ -864,28 +883,19 @@
       return;
     }
 
+    const statusMap = {
+      pendente:   { cls: 'status-pendente',   label: 'Pendente'   },
+      confirmada: { cls: 'status-confirmada', label: 'Confirmada' },
+      cancelada:  { cls: 'status-cancelada',  label: 'Cancelada'  },
+    };
+
     listaEl.innerHTML = '';
     pagina.forEach((r) => {
-      const cliente = clientesPorId[r.clienteId] || {};
-      const nome    = cliente.nome || '(cliente removido)';
-      const valor   = r.valor != null
+      const nome  = (clientesPorId[r.clienteId] || {}).nome || '(cliente removido)';
+      const valor = r.valor != null
         ? `R$ ${Number(r.valor).toFixed(2).replace('.', ',')}`
         : '-';
-
-      const statusMap = {
-        pendente:   { cls: 'status-pendente',   label: 'Pendente'   },
-        confirmada: { cls: 'status-confirmada', label: 'Confirmada' },
-        cancelada:  { cls: 'status-cancelada',  label: 'Cancelada'  },
-      };
       const st = statusMap[r.status] || statusMap['pendente'];
-
-      const textoEntrada = r.horaEntrada
-        ? `${formatarData(r.dataEntrada)} ${r.horaEntrada}`
-        : formatarData(r.dataEntrada);
-
-      const textoSaida = r.horaSaida
-        ? `${formatarData(r.dataSaida)} ${r.horaSaida}`
-        : formatarData(r.dataSaida);
 
       listaEl.innerHTML += `
         <tr>
@@ -893,8 +903,14 @@
             <strong>${nome}</strong>
             ${r.observacoes ? `<div class="obs-texto"><i class="fas fa-sticky-note"></i> ${r.observacoes}</div>` : ''}
           </td>
-          <td>${textoEntrada}</td>
-          <td>${textoSaida}</td>
+          <td>
+            ${formatarData(r.dataEntrada)}
+            ${r.horaEntrada ? `<div class="horario-texto"><i class="fas fa-clock"></i> ${r.horaEntrada}</div>` : ''}
+          </td>
+          <td>
+            ${formatarData(r.dataSaida)}
+            ${r.horaSaida ? `<div class="horario-texto"><i class="fas fa-clock"></i> ${r.horaSaida}</div>` : ''}
+          </td>
           <td>${r.hospedes || '-'}</td>
           <td>${valor}</td>
           <td>
@@ -949,20 +965,20 @@
     paginacaoEl.appendChild(info);
   }
 
-  // Editar reserva
+  // ── Editar reserva ──
   window.abrirEdicao = (id) => {
     const r = reservas.find(x => x.id === id);
     if (!r) return;
     reservaEditandoId = id;
     document.getElementById('editClienteId').value   = r.clienteId   || '';
-    document.getElementById('editDataEntrada').value = r.dataEntrada || '';
-    document.getElementById('editDataSaida').value   = r.dataSaida   || '';
-    document.getElementById('editHoraEntrada').value = r.horaEntrada || '';
-    document.getElementById('editHoraSaida').value   = r.horaSaida   || '';
-    document.getElementById('editHospedes').value    = r.hospedes    || '';
-    document.getElementById('editValor').value       = r.valor       || '';
-    document.getElementById('editStatus').value      = r.status      || 'pendente';
-    document.getElementById('editObs').value         = r.observacoes || '';
+    document.getElementById('editDataEntrada').value = r.dataEntrada  || '';
+    document.getElementById('editDataSaida').value   = r.dataSaida    || '';
+    document.getElementById('editHoraEntrada').value = r.horaEntrada  || '';
+    document.getElementById('editHoraSaida').value   = r.horaSaida    || '';
+    document.getElementById('editHospedes').value    = r.hospedes     || '';
+    document.getElementById('editValor').value       = r.valor        || '';
+    document.getElementById('editStatus').value      = r.status       || 'pendente';
+    document.getElementById('editObs').value         = r.observacoes  || '';
     modalOverlay.classList.add('ativo');
   };
 
@@ -973,49 +989,84 @@
 
   document.getElementById('btnSalvarEdicao').addEventListener('click', async () => {
     if (!reservaEditandoId) return;
-    const hospedes = document.getElementById('editHospedes').value;
-    const valor    = document.getElementById('editValor').value;
+
+    const reservaOriginal = reservas.find(r => r.id === reservaEditandoId);
+    const clienteId   = document.getElementById('editClienteId').value;
+    const dataEntrada = document.getElementById('editDataEntrada').value;
+    const dataSaida   = document.getElementById('editDataSaida').value;
+    const horaEntrada = document.getElementById('editHoraEntrada').value || null;
+    const horaSaida   = document.getElementById('editHoraSaida').value   || null;
+    const hospedes    = document.getElementById('editHospedes').value;
+    const valor       = document.getElementById('editValor').value;
+    const status      = document.getElementById('editStatus').value;
+    const observacoes = document.getElementById('editObs').value.trim();
+
     try {
+      // 1) Atualiza Firestore
       await updateDoc(doc(db, 'reservas', reservaEditandoId), {
-        clienteId:   document.getElementById('editClienteId').value,
-        dataEntrada: document.getElementById('editDataEntrada').value,
-        dataSaida:   document.getElementById('editDataSaida').value,
-        horaEntrada: document.getElementById('editHoraEntrada').value || null,
-        horaSaida:   document.getElementById('editHoraSaida').value   || null,
+        clienteId,
+        dataEntrada,
+        dataSaida,
+        horaEntrada,
+        horaSaida,
         hospedes:    hospedes ? Number(hospedes) : null,
         valor:       valor    ? Number(valor)    : null,
-        status:      document.getElementById('editStatus').value,
-        observacoes: document.getElementById('editObs').value.trim(),
+        status,
+        observacoes,
       });
+
+      // 2) Atualiza evento no Google Calendar
+      if (reservaOriginal && reservaOriginal.googleEventId) {
+        const nomeCliente = (clientesPorId[clienteId] || {}).nome || 'Cliente';
+        await chamarCalendario({
+          acao:        'atualizar',
+          eventId:     reservaOriginal.googleEventId,
+          titulo:      `Reserva – ${nomeCliente} (${hospedes || '?'} hóspedes)`,
+          dataEntrada,
+          dataSaida,
+          horaEntrada,
+          horaSaida,
+          descricao:   montarDescricao(nomeCliente, hospedes, valor, status, horaEntrada, horaSaida, observacoes),
+        });
+      }
+
       mostrarMensagem('Reserva atualizada com sucesso!');
       modalOverlay.classList.remove('ativo');
       reservaEditandoId = null;
       recarregarCalendario();
+
     } catch (error) {
       console.error("Erro ao editar reserva:", error);
       mostrarMensagem('Erro ao atualizar reserva.', 'erro');
     }
   });
 
-  // Excluir reserva
+  // ── Excluir reserva ──
   window.excluirReserva = async (id) => {
     if (!confirm('Tem certeza que deseja excluir esta reserva?')) return;
+
+    const reserva = reservas.find(r => r.id === id);
+
     try {
+      // 1) Exclui do Firestore
       await deleteDoc(doc(db, 'reservas', id));
+
+      // 2) Exclui do Google Calendar
+      if (reserva && reserva.googleEventId) {
+        await chamarCalendario({
+          acao:    'excluir',
+          eventId: reserva.googleEventId,
+        });
+      }
+
       mostrarMensagem('Reserva excluída com sucesso!');
       recarregarCalendario();
+
     } catch (error) {
       console.error("Erro ao excluir reserva:", error);
       mostrarMensagem('Erro ao excluir reserva.', 'erro');
     }
   };
-
-  function formatarData(valor) {
-    if (!valor) return '-';
-    const [ano, mes, dia] = valor.split('-');
-    if (!ano || !mes || !dia) return valor;
-    return `${dia}/${mes}/${ano}`;
-  }
 </script>
 
 </body>
