@@ -86,6 +86,9 @@
     }
     .btn-outline:hover { background: var(--primary); color: var(--white); }
 
+    .btn-warning { background: #f0ad4e; color: var(--white); }
+    .btn-warning:hover { background: #ec971f; transform: translateY(-2px); }
+
     .btn-danger { background: #dc3545; color: var(--white); }
     .btn-danger:hover { background: #b02a37; transform: translateY(-2px); }
 
@@ -158,7 +161,6 @@
     }
 
     .form-full { grid-column: 1 / -1; }
-
     .form-group { display: flex; flex-direction: column; gap: 5px; }
 
     label {
@@ -186,7 +188,6 @@
     }
 
     textarea { resize: vertical; min-height: 70px; }
-
     .form-actions { margin-top: 20px; }
 
     #mensagem {
@@ -219,6 +220,13 @@
       flex-wrap: wrap;
     }
 
+    .toolbar-left {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
     .contador {
       font-size: 0.85rem;
       color: var(--gray);
@@ -243,6 +251,8 @@
       color: var(--gray);
       font-size: 0.85rem;
     }
+
+    select { cursor: pointer; }
 
     .table-wrapper { overflow-x: auto; }
 
@@ -275,29 +285,25 @@
     .status-badge {
       display: inline-flex;
       align-items: center;
-      gap: 6px;
+      gap: 5px;
       padding: 4px 10px;
       border-radius: 50px;
       font-size: 0.8rem;
       font-weight: 600;
     }
 
-    .status-pendente {
-      background: #fff3cd;
-      color: #856404;
-    }
-
-    .status-confirmada {
-      background: #d1e7dd;
-      color: #0f5132;
-    }
-
-    .status-cancelada {
-      background: #f8d7da;
-      color: #842029;
-    }
+    .status-pendente   { background: #fff3cd; color: #856404; }
+    .status-confirmada { background: #d1e7dd; color: #0f5132; }
+    .status-cancelada  { background: #f8d7da; color: #842029; }
 
     .acoes { display: flex; gap: 6px; flex-wrap: wrap; }
+
+    .obs-texto {
+      font-size: 0.8rem;
+      color: var(--gray);
+      margin-top: 4px;
+      font-style: italic;
+    }
 
     .paginacao {
       display: flex;
@@ -322,19 +328,61 @@
     }
 
     .paginacao button:hover,
-    .paginacao button.ativo {
-      background: var(--primary);
-      color: var(--white);
-    }
-
-    .paginacao button:disabled {
-      opacity: 0.4;
-      cursor: not-allowed;
-    }
+    .paginacao button.ativo { background: var(--primary); color: var(--white); }
+    .paginacao button:disabled { opacity: 0.4; cursor: not-allowed; }
 
     .paginacao-info {
       font-size: 0.82rem;
       color: var(--gray);
+    }
+
+    /* Modal */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.5);
+      z-index: 999;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+    }
+
+    .modal-overlay.ativo { display: flex; }
+
+    .modal {
+      background: var(--white);
+      border-radius: 12px;
+      padding: 32px 28px;
+      width: 100%;
+      max-width: 560px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+      animation: fadeInUp 0.3s ease;
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+
+    .modal h2 {
+      font-family: 'Montserrat', sans-serif;
+      font-weight: 700;
+      font-size: 1.1rem;
+      color: var(--primary);
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .modal-botoes {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      margin-top: 24px;
+    }
+
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to   { opacity: 1; transform: translateY(0); }
     }
 
     @media (max-width: 700px) {
@@ -380,10 +428,11 @@
     <h2><i class="fas fa-calendar-plus"></i> Nova Reserva</h2>
     <form id="formReserva">
       <div class="form-grid">
+
         <div class="form-group form-full">
           <label>Cliente *</label>
           <select id="clienteId" required>
-            <option value="">Selecione um cliente...</option>
+            <option value="">Carregando clientes...</option>
           </select>
         </div>
 
@@ -404,7 +453,7 @@
 
         <div class="form-group">
           <label>Valor (R$)</label>
-          <input type="number" id="valor" min="0" step="0.01" placeholder="Ex: 1899,90">
+          <input type="number" id="valor" min="0" step="0.01" placeholder="Ex: 1899.90">
         </div>
 
         <div class="form-group">
@@ -420,8 +469,8 @@
           <label>Observações</label>
           <textarea id="obsReserva" placeholder="Informações adicionais desta reserva..."></textarea>
         </div>
-      </div>
 
+      </div>
       <div class="form-actions">
         <button type="submit" class="btn btn-primary">
           <i class="fas fa-save"></i> Salvar Reserva
@@ -430,15 +479,23 @@
     </form>
   </div>
 
-  <!-- LISTA DE RESERVAS -->
+  <!-- LISTA -->
   <div class="card">
     <h2><i class="fas fa-calendar-check"></i> Reservas Cadastradas</h2>
 
     <div class="list-toolbar">
-      <span class="contador" id="contadorReservas">0 reservas</span>
+      <div class="toolbar-left">
+        <span class="contador" id="contadorReservas">0 reservas</span>
+        <select id="filtroStatus">
+          <option value="">Todos os status</option>
+          <option value="pendente">Pendente</option>
+          <option value="confirmada">Confirmada</option>
+          <option value="cancelada">Cancelada</option>
+        </select>
+      </div>
       <div class="search-box">
         <i class="fas fa-search"></i>
-        <input type="text" id="busca" placeholder="Buscar por cliente ou status">
+        <input type="text" id="busca" placeholder="Buscar por cliente">
       </div>
     </div>
 
@@ -447,7 +504,8 @@
         <thead>
           <tr>
             <th>Cliente</th>
-            <th>Período</th>
+            <th>Entrada</th>
+            <th>Saída</th>
             <th>Hóspedes</th>
             <th>Valor</th>
             <th>Status</th>
@@ -455,5 +513,378 @@
           </tr>
         </thead>
         <tbody id="listaReservas">
-          <tr><td colspan="6" style="color:var(--gray);text-align:center;padding:24px
+          <tr><td colspan="7" style="color:var(--gray);text-align:center;padding:24px;">Carregando...</td></tr>
+        </tbody>
+      </table>
+    </div>
 
+    <div class="paginacao" id="paginacao"></div>
+  </div>
+
+</div>
+
+<!-- Modal edição de reserva -->
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal">
+    <h2><i class="fas fa-calendar-alt"></i> Editar Reserva</h2>
+    <div class="form-grid">
+
+      <div class="form-group form-full">
+        <label>Cliente *</label>
+        <select id="editClienteId" required></select>
+      </div>
+
+      <div class="form-group">
+        <label>Data de entrada *</label>
+        <input type="date" id="editDataEntrada">
+      </div>
+
+      <div class="form-group">
+        <label>Data de saída *</label>
+        <input type="date" id="editDataSaida">
+      </div>
+
+      <div class="form-group">
+        <label>Nº de hóspedes</label>
+        <input type="number" id="editHospedes" min="1">
+      </div>
+
+      <div class="form-group">
+        <label>Valor (R$)</label>
+        <input type="number" id="editValor" min="0" step="0.01">
+      </div>
+
+      <div class="form-group form-full">
+        <label>Status</label>
+        <select id="editStatus">
+          <option value="pendente">Pendente</option>
+          <option value="confirmada">Confirmada</option>
+          <option value="cancelada">Cancelada</option>
+        </select>
+      </div>
+
+      <div class="form-group form-full">
+        <label>Observações</label>
+        <textarea id="editObs"></textarea>
+      </div>
+
+    </div>
+    <div class="modal-botoes">
+      <button class="btn btn-outline" id="btnCancelarEdicao">Cancelar</button>
+      <button class="btn btn-primary" id="btnSalvarEdicao">
+        <i class="fas fa-save"></i> Salvar alterações
+      </button>
+    </div>
+  </div>
+</div>
+
+<script type="module">
+  import { auth, db } from "../assets/js/firebase.js";
+  import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+  import {
+    collection, addDoc, onSnapshot, orderBy, query,
+    doc, deleteDoc, getDocs, updateDoc
+  } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+
+  // Elementos
+  const mensagemEl    = document.getElementById('mensagem');
+  const formReserva   = document.getElementById('formReserva');
+  const clienteSelect = document.getElementById('clienteId');
+  const listaEl       = document.getElementById('listaReservas');
+  const contadorEl    = document.getElementById('contadorReservas');
+  const buscaEl       = document.getElementById('busca');
+  const filtroStatus  = document.getElementById('filtroStatus');
+  const paginacaoEl   = document.getElementById('paginacao');
+  const modalOverlay  = document.getElementById('modalOverlay');
+
+  let reservas        = [];
+  let clientesPorId   = {};
+  let reservaEditandoId = null;
+  const POR_PAGINA    = 10;
+  let paginaAtual     = 1;
+
+  // Protege página
+  onAuthStateChanged(auth, async (user) => {
+    if (!user) {
+      window.location.href = "/admin/login.html";
+      return;
+    }
+    document.getElementById('usuarioLogado').textContent = user.email;
+    await carregarClientes();
+    carregarReservas();
+  });
+
+  document.getElementById('btnSair').addEventListener('click', async () => {
+    await signOut(auth);
+    window.location.href = "/admin/login.html";
+  });
+
+  function mostrarMensagem(texto, tipo = 'sucesso') {
+    mensagemEl.textContent = texto;
+    mensagemEl.className = tipo;
+    setTimeout(() => { mensagemEl.className = ''; mensagemEl.textContent = ''; }, 3500);
+  }
+
+  // ── Carregar clientes ──
+  async function carregarClientes() {
+    try {
+      const snap = await getDocs(collection(db, 'clientes'));
+      clientesPorId = {};
+
+      const options = ['<option value="">Selecione um cliente...</option>'];
+      const optionsEdit = ['<option value="">Selecione um cliente...</option>'];
+
+      snap.forEach((docSnap) => {
+        const c = docSnap.data();
+        clientesPorId[docSnap.id] = c;
+        const nome = c.nome || '(sem nome)';
+        options.push(`<option value="${docSnap.id}">${nome}</option>`);
+        optionsEdit.push(`<option value="${docSnap.id}">${nome}</option>`);
+      });
+
+      clienteSelect.innerHTML = options.join('');
+      document.getElementById('editClienteId').innerHTML = optionsEdit.join('');
+
+    } catch (erro) {
+      console.error("Erro ao carregar clientes:", erro);
+      clienteSelect.innerHTML = '<option value="">Erro ao carregar clientes</option>';
+      mostrarMensagem("Erro ao carregar clientes. Verifique as regras do Firestore.", "erro");
+    }
+  }
+
+  // ── Salvar nova reserva ──
+  formReserva.addEventListener('submit', async (e) => {
+    e.preventDefault();
+
+    const clienteId   = clienteSelect.value;
+    const dataEntrada = document.getElementById('dataEntrada').value;
+    const dataSaida   = document.getElementById('dataSaida').value;
+    const hospedes    = document.getElementById('hospedes').value;
+    const valor       = document.getElementById('valor').value;
+    const status      = document.getElementById('status').value;
+    const obs         = document.getElementById('obsReserva').value.trim();
+
+    if (!clienteId) {
+      mostrarMensagem('Selecione um cliente.', 'erro');
+      return;
+    }
+
+    if (!dataEntrada || !dataSaida) {
+      mostrarMensagem('Preencha as datas de entrada e saída.', 'erro');
+      return;
+    }
+
+    if (dataSaida < dataEntrada) {
+      mostrarMensagem('A data de saída não pode ser anterior à data de entrada.', 'erro');
+      return;
+    }
+
+    try {
+      await addDoc(collection(db, 'reservas'), {
+        clienteId,
+        dataEntrada,
+        dataSaida,
+        hospedes:    hospedes ? Number(hospedes) : null,
+        valor:       valor    ? Number(valor)    : null,
+        status,
+        observacoes: obs,
+        criadoEm:    new Date()
+      });
+
+      mostrarMensagem('Reserva salva com sucesso!');
+      formReserva.reset();
+      clienteSelect.value = '';
+      paginaAtual = 1;
+    } catch (error) {
+      console.error("Erro ao salvar reserva:", error);
+      mostrarMensagem('Erro ao salvar reserva.', 'erro');
+    }
+  });
+
+  // ── Carregar reservas em tempo real ──
+  function carregarReservas() {
+    const q = query(collection(db, 'reservas'), orderBy('criadoEm', 'desc'));
+    onSnapshot(q, (snapshot) => {
+      reservas = [];
+      snapshot.forEach((docSnap) => {
+        reservas.push({ id: docSnap.id, ...docSnap.data() });
+      });
+      paginaAtual = 1;
+      renderizar();
+    }, (erro) => {
+      console.error("Erro ao carregar reservas:", erro);
+      mostrarMensagem("Erro ao carregar reservas.", "erro");
+    });
+  }
+
+  buscaEl.addEventListener('input',          () => { paginaAtual = 1; renderizar(); });
+  filtroStatus.addEventListener('change',    () => { paginaAtual = 1; renderizar(); });
+
+  // ── Renderizar tabela ──
+  function renderizar() {
+    const termo  = buscaEl.value.trim().toLowerCase();
+    const status = filtroStatus.value;
+
+    let lista = reservas.filter((r) => {
+      const cliente = clientesPorId[r.clienteId] || {};
+      const nome    = (cliente.nome || '').toLowerCase();
+      const matchBusca  = !termo  || nome.includes(termo);
+      const matchStatus = !status || r.status === status;
+      return matchBusca && matchStatus;
+    });
+
+    contadorEl.textContent = lista.length + (lista.length === 1 ? ' reserva' : ' reservas');
+
+    const total  = lista.length;
+    const inicio = (paginaAtual - 1) * POR_PAGINA;
+    const pagina = lista.slice(inicio, inicio + POR_PAGINA);
+
+    if (!pagina.length) {
+      listaEl.innerHTML = `<tr><td colspan="7" style="color:var(--gray);text-align:center;padding:24px;">Nenhuma reserva encontrada.</td></tr>`;
+      paginacaoEl.innerHTML = '';
+      return;
+    }
+
+    listaEl.innerHTML = '';
+    pagina.forEach((r) => {
+      const cliente = clientesPorId[r.clienteId] || {};
+      const nome    = cliente.nome || '(cliente removido)';
+      const valor   = r.valor != null
+        ? `R$ ${Number(r.valor).toFixed(2).replace('.', ',')}`
+        : '-';
+
+      const statusMap = {
+        pendente:   { cls: 'status-pendente',   label: 'Pendente'   },
+        confirmada: { cls: 'status-confirmada', label: 'Confirmada' },
+        cancelada:  { cls: 'status-cancelada',  label: 'Cancelada'  },
+      };
+      const st = statusMap[r.status] || statusMap['pendente'];
+
+      listaEl.innerHTML += `
+        <tr>
+          <td>
+            <strong>${nome}</strong>
+            ${r.observacoes ? `<div class="obs-texto"><i class="fas fa-sticky-note"></i> ${r.observacoes}</div>` : ''}
+          </td>
+          <td>${formatarData(r.dataEntrada)}</td>
+          <td>${formatarData(r.dataSaida)}</td>
+          <td>${r.hospedes || '-'}</td>
+          <td>${valor}</td>
+          <td>
+            <span class="status-badge ${st.cls}">
+              <i class="fas fa-circle" style="font-size:0.5rem"></i> ${st.label}
+            </span>
+          </td>
+          <td>
+            <div class="acoes">
+              <button class="btn btn-warning btn-sm" onclick="abrirEdicao('${r.id}')">
+                <i class="fas fa-edit"></i>
+              </button>
+              <button class="btn btn-danger btn-sm" onclick="excluirReserva('${r.id}')">
+                <i class="fas fa-trash"></i>
+              </button>
+            </div>
+          </td>
+        </tr>`;
+    });
+
+    renderizarPaginacao(total);
+  }
+
+  function renderizarPaginacao(total) {
+    const totalPaginas = Math.ceil(total / POR_PAGINA);
+    paginacaoEl.innerHTML = '';
+    if (totalPaginas <= 1) return;
+
+    const prev = document.createElement('button');
+    prev.innerHTML = '<i class="fas fa-chevron-left"></i>';
+    prev.disabled  = paginaAtual === 1;
+    prev.addEventListener('click', () => { paginaAtual--; renderizar(); });
+    paginacaoEl.appendChild(prev);
+
+    for (let i = 1; i <= totalPaginas; i++) {
+      const btn = document.createElement('button');
+      btn.textContent = i;
+      if (i === paginaAtual) btn.classList.add('ativo');
+      btn.addEventListener('click', () => { paginaAtual = i; renderizar(); });
+      paginacaoEl.appendChild(btn);
+    }
+
+    const next = document.createElement('button');
+    next.innerHTML = '<i class="fas fa-chevron-right"></i>';
+    next.disabled  = paginaAtual === totalPaginas;
+    next.addEventListener('click', () => { paginaAtual++; renderizar(); });
+    paginacaoEl.appendChild(next);
+
+    const info = document.createElement('span');
+    info.className   = 'paginacao-info';
+    info.textContent = `Página ${paginaAtual} de ${totalPaginas}`;
+    paginacaoEl.appendChild(info);
+  }
+
+  // ── Editar reserva ──
+  window.abrirEdicao = (id) => {
+    const r = reservas.find(x => x.id === id);
+    if (!r) return;
+    reservaEditandoId = id;
+    document.getElementById('editClienteId').value  = r.clienteId    || '';
+    document.getElementById('editDataEntrada').value = r.dataEntrada  || '';
+    document.getElementById('editDataSaida').value   = r.dataSaida    || '';
+    document.getElementById('editHospedes').value    = r.hospedes     || '';
+    document.getElementById('editValor').value       = r.valor        || '';
+    document.getElementById('editStatus').value      = r.status       || 'pendente';
+    document.getElementById('editObs').value         = r.observacoes  || '';
+    modalOverlay.classList.add('ativo');
+  };
+
+  document.getElementById('btnCancelarEdicao').addEventListener('click', () => {
+    modalOverlay.classList.remove('ativo');
+    reservaEditandoId = null;
+  });
+
+  document.getElementById('btnSalvarEdicao').addEventListener('click', async () => {
+    if (!reservaEditandoId) return;
+    const hospedes = document.getElementById('editHospedes').value;
+    const valor    = document.getElementById('editValor').value;
+    try {
+      await updateDoc(doc(db, 'reservas', reservaEditandoId), {
+        clienteId:   document.getElementById('editClienteId').value,
+        dataEntrada: document.getElementById('editDataEntrada').value,
+        dataSaida:   document.getElementById('editDataSaida').value,
+        hospedes:    hospedes ? Number(hospedes) : null,
+        valor:       valor    ? Number(valor)    : null,
+        status:      document.getElementById('editStatus').value,
+        observacoes: document.getElementById('editObs').value.trim(),
+      });
+      mostrarMensagem('Reserva atualizada com sucesso!');
+      modalOverlay.classList.remove('ativo');
+      reservaEditandoId = null;
+    } catch (error) {
+      console.error("Erro ao editar reserva:", error);
+      mostrarMensagem('Erro ao atualizar reserva.', 'erro');
+    }
+  });
+
+  // ── Excluir reserva ──
+  window.excluirReserva = async (id) => {
+    if (!confirm('Tem certeza que deseja excluir esta reserva?')) return;
+    try {
+      await deleteDoc(doc(db, 'reservas', id));
+      mostrarMensagem('Reserva excluída com sucesso!');
+    } catch (error) {
+      console.error("Erro ao excluir reserva:", error);
+      mostrarMensagem('Erro ao excluir reserva.', 'erro');
+    }
+  };
+
+  // ── Formatar data ──
+  function formatarData(valor) {
+    if (!valor) return '-';
+    const [ano, mes, dia] = valor.split('-');
+    if (!ano || !mes || !dia) return valor;
+    return `${dia}/${mes}/${ano}`;
+  }
+</script>
+
+</body>
+</html>
