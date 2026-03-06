@@ -2,148 +2,539 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Clientes - Casa do Céu</title>
+  <link rel="icon" href="https://i.imgur.com/Tgntdk2.png" type="image/png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700;800&family=Quicksand:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
   <style>
-    body { font-family: Arial, sans-serif; max-width: 800px; margin: 40px auto; padding: 0 20px; }
-    h1 { color: #333; }
-    form { background: #f5f5f5; padding: 20px; border-radius: 8px; margin-bottom: 30px; }
-    label { display: block; margin-bottom: 5px; font-weight: bold; }
-    input { width: 100%; padding: 8px; margin-bottom: 15px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
-    button { background: #4CAF50; color: white; padding: 10px 20px; border: none; border-radius: 4px; cursor: pointer; }
-    button:hover { background: #45a049; }
-    .btn-sair { background: #999; margin-left: 10px; }
-    table { width: 100%; border-collapse: collapse; }
-    th, td { padding: 10px; border: 1px solid #ddd; text-align: left; }
-    th { background: #4CAF50; color: white; }
-    tr:nth-child(even) { background: #f9f9f9; }
-    #mensagem { color: green; margin-bottom: 10px; }
+    :root {
+      --primary: #0077cc;
+      --primary-dark: #005fa3;
+      --light: #f8f9fa;
+      --dark: #212529;
+      --gray: #6c757d;
+      --white: #ffffff;
+      --shadow: 0 4px 12px rgba(0,0,0,0.1);
+      --transition: all 0.3s ease;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Quicksand', sans-serif;
+      background: var(--light);
+      color: var(--dark);
+    }
+
+    nav {
+      background: var(--white);
+      box-shadow: var(--shadow);
+      padding: 1rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .nav-logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-family: 'Montserrat', sans-serif;
+      font-weight: 800;
+      font-size: 1.1rem;
+      color: var(--primary);
+      text-decoration: none;
+    }
+
+    .nav-logo img { height: 30px; }
+
+    .nav-right {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 18px;
+      border-radius: 50px;
+      border: none;
+      font-family: 'Quicksand', sans-serif;
+      font-weight: 600;
+      font-size: 0.85rem;
+      cursor: pointer;
+      text-decoration: none;
+      transition: var(--transition);
+    }
+
+    .btn-primary { background: var(--primary); color: var(--white); }
+    .btn-primary:hover { background: var(--primary-dark); transform: translateY(-2px); }
+
+    .btn-outline {
+      background: transparent;
+      border: 2px solid var(--primary);
+      color: var(--primary);
+    }
+    .btn-outline:hover { background: var(--primary); color: var(--white); }
+
+    .btn-danger { background: #dc3545; color: var(--white); }
+    .btn-danger:hover { background: #b02a37; transform: translateY(-2px); }
+
+    .btn-sm { padding: 5px 12px; font-size: 0.78rem; }
+
+    .container {
+      max-width: 1000px;
+      margin: 0 auto;
+      padding: 40px 24px;
+    }
+
+    .page-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 32px;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+
+    .page-title {
+      font-family: 'Montserrat', sans-serif;
+      font-weight: 700;
+      font-size: 1.8rem;
+      color: var(--primary);
+      position: relative;
+      display: inline-block;
+    }
+
+    .page-title::after {
+      content: '';
+      position: absolute;
+      bottom: -8px;
+      left: 0;
+      width: 60px;
+      height: 4px;
+      background: var(--primary);
+      border-radius: 2px;
+    }
+
+    .page-subtitle {
+      color: var(--gray);
+      margin-top: 12px;
+      font-size: 0.9rem;
+    }
+
+    .card {
+      background: var(--white);
+      border-radius: 12px;
+      padding: 28px 24px;
+      box-shadow: var(--shadow);
+      margin-bottom: 24px;
+    }
+
+    .card h2 {
+      font-family: 'Montserrat', sans-serif;
+      font-weight: 700;
+      font-size: 1rem;
+      color: var(--primary);
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+
+    .form-full { grid-column: 1 / -1; }
+
+    .form-group { display: flex; flex-direction: column; gap: 5px; }
+
+    label {
+      font-weight: 600;
+      font-size: 0.85rem;
+      color: var(--dark);
+    }
+
+    input, textarea {
+      padding: 10px 12px;
+      border: 1px solid #dee2e6;
+      border-radius: 8px;
+      font-family: 'Quicksand', sans-serif;
+      font-size: 0.9rem;
+      background: var(--light);
+      color: var(--dark);
+      transition: var(--transition);
+      outline: none;
+    }
+
+    input:focus, textarea:focus {
+      border-color: var(--primary);
+      background: var(--white);
+      box-shadow: 0 0 0 3px rgba(0,119,204,0.12);
+    }
+
+    textarea { resize: vertical; min-height: 80px; }
+
+    .form-actions { margin-top: 20px; }
+
+    #mensagem {
+      padding: 10px 16px;
+      border-radius: 8px;
+      font-size: 0.88rem;
+      font-weight: 600;
+      margin-bottom: 16px;
+      display: none;
+    }
+
+    #mensagem.sucesso { background: #d1e7dd; color: #0a3622; display: block; }
+    #mensagem.erro    { background: #f8d7da; color: #58151c; display: block; }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.88rem;
+    }
+
+    th {
+      background: var(--primary);
+      color: var(--white);
+      padding: 12px 14px;
+      text-align: left;
+      font-family: 'Montserrat', sans-serif;
+      font-weight: 600;
+    }
+
+    th:first-child { border-radius: 8px 0 0 0; }
+    th:last-child  { border-radius: 0 8px 0 0; }
+
+    td { padding: 12px 14px; border-bottom: 1px solid #f0f0f0; }
+    tr:hover td { background: #f8f9fa; }
+
+    .acoes { display: flex; gap: 6px; }
+
+    .user-badge {
+      background: rgba(0,119,204,0.08);
+      color: var(--primary);
+      padding: 4px 12px;
+      border-radius: 50px;
+      font-size: 0.8rem;
+      font-weight: 600;
+    }
+
+    /* Modal */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.5);
+      z-index: 999;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+    }
+
+    .modal-overlay.ativo { display: flex; }
+
+    .modal {
+      background: var(--white);
+      border-radius: 12px;
+      padding: 32px 28px;
+      width: 100%;
+      max-width: 520px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+      animation: fadeInUp 0.3s ease;
+    }
+
+    .modal h2 {
+      font-family: 'Montserrat', sans-serif;
+      font-weight: 700;
+      font-size: 1.1rem;
+      color: var(--primary);
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .modal-botoes {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      margin-top: 20px;
+    }
+
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    @media (max-width: 600px) {
+      .form-grid { grid-template-columns: 1fr; }
+      nav { padding: 1rem; }
+      .container { padding: 24px 16px; }
+      .page-header { flex-direction: column; }
+    }
   </style>
 </head>
 <body>
 
-  <h1>Clientes - Casa do Céu</h1>
+<nav>
+  <a href="/admin/dashboard.html" class="nav-logo">
+    <img src="https://i.imgur.com/Tgntdk2.png" alt="Logo Casa do Céu">
+    <span>Casa do Céu</span>
+  </a>
+  <div class="nav-right">
+    <span class="user-badge"><i class="fas fa-user"></i> <span id="usuarioLogado"></span></span>
+    <a href="/admin/dashboard.html" class="btn btn-outline">
+      <i class="fas fa-arrow-left"></i> Dashboard
+    </a>
+    <button class="btn btn-outline" id="btnSair">
+      <i class="fas fa-sign-out-alt"></i> Sair
+    </button>
+  </div>
+</nav>
 
-  <p>
-    <a href="/admin/dashboard.html">← Voltar ao Dashboard</a>
-    <button class="btn-sair" id="btnSair">Sair</button>
-  </p>
+<div class="container">
 
-  <p id="mensagem"></p>
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">Clientes</h1>
+      <p class="page-subtitle">Cadastre e gerencie os clientes da Casa do Céu</p>
+    </div>
+  </div>
 
-  <!-- Formulário de cadastro -->
-  <form id="formCliente">
-    <h2>Novo Cliente</h2>
+  <div id="mensagem"></div>
 
-    <label>Nome completo</label>
-    <input type="text" id="nome" required>
+  <!-- Formulário -->
+  <div class="card">
+    <h2><i class="fas fa-user-plus"></i> Novo Cliente</h2>
+    <form id="formCliente">
+      <div class="form-grid">
+        <div class="form-group">
+          <label>Nome completo *</label>
+          <input type="text" id="nome" required placeholder="Nome do cliente">
+        </div>
+        <div class="form-group">
+          <label>Telefone *</label>
+          <input type="tel" id="telefone" required placeholder="(31) 99999-9999">
+        </div>
+        <div class="form-group">
+          <label>E-mail</label>
+          <input type="email" id="emailCliente" placeholder="email@exemplo.com">
+        </div>
+        <div class="form-group">
+          <label>CPF</label>
+          <input type="text" id="cpf" placeholder="000.000.000-00">
+        </div>
+        <div class="form-group form-full">
+          <label>Observações</label>
+          <textarea id="observacoes" placeholder="Alergias, preferências, informações importantes..."></textarea>
+        </div>
+      </div>
+      <div class="form-actions">
+        <button type="submit" class="btn btn-primary">
+          <i class="fas fa-save"></i> Salvar Cliente
+        </button>
+      </div>
+    </form>
+  </div>
 
-    <label>Telefone</label>
-    <input type="tel" id="telefone" required>
+  <!-- Lista -->
+  <div class="card">
+    <h2><i class="fas fa-users"></i> Clientes Cadastrados</h2>
+    <table>
+      <thead>
+        <tr>
+          <th>Nome</th>
+          <th>Telefone</th>
+          <th>E-mail</th>
+          <th>CPF</th>
+          <th>Ações</th>
+        </tr>
+      </thead>
+      <tbody id="listaClientes">
+        <tr><td colspan="5" style="color:var(--gray); text-align:center; padding:24px;">Carregando...</td></tr>
+      </tbody>
+    </table>
+  </div>
 
-    <label>E-mail</label>
-    <input type="email" id="emailCliente">
+</div>
 
-    <label>CPF</label>
-    <input type="text" id="cpf">
+<!-- Modal edição -->
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal">
+    <h2><i class="fas fa-user-edit"></i> Editar Cliente</h2>
+    <div class="form-grid">
+      <div class="form-group form-full">
+        <label>Nome completo *</label>
+        <input type="text" id="editNome">
+      </div>
+      <div class="form-group">
+        <label>Telefone *</label>
+        <input type="tel" id="editTelefone">
+      </div>
+      <div class="form-group">
+        <label>E-mail</label>
+        <input type="email" id="editEmail">
+      </div>
+      <div class="form-group">
+        <label>CPF</label>
+        <input type="text" id="editCpf">
+      </div>
+      <div class="form-group form-full">
+        <label>Observações</label>
+        <textarea id="editObservacoes"></textarea>
+      </div>
+    </div>
+    <div class="modal-botoes">
+      <button class="btn btn-outline" id="btnCancelarEdicao">Cancelar</button>
+      <button class="btn btn-primary" id="btnSalvarEdicao">
+        <i class="fas fa-save"></i> Salvar alterações
+      </button>
+    </div>
+  </div>
+</div>
 
-    <button type="submit">Salvar Cliente</button>
-  </form>
+<script type="module">
+  import { auth, db } from "../assets/js/firebase.js";
+  import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+  import {
+    collection, addDoc, onSnapshot, orderBy, query,
+    doc, updateDoc, deleteDoc
+  } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-  <!-- Lista de clientes -->
-  <h2>Clientes Cadastrados</h2>
-  <table>
-    <thead>
-      <tr>
-        <th>Nome</th>
-        <th>Telefone</th>
-        <th>E-mail</th>
-        <th>CPF</th>
-      </tr>
-    </thead>
-    <tbody id="listaClientes">
-      <tr><td colspan="4">Carregando...</td></tr>
-    </tbody>
-  </table>
+  const mensagemEl  = document.getElementById('mensagem');
+  const listaEl     = document.getElementById('listaClientes');
+  const formEl      = document.getElementById('formCliente');
+  const modalOverlay = document.getElementById('modalOverlay');
+  let clienteEditandoId = null;
 
-  <script type="module">
-    import { auth, db } from "../assets/js/firebase.js";
-    import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
-    import { collection, addDoc, onSnapshot, orderBy, query } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
+  onAuthStateChanged(auth, (user) => {
+    if (!user) { window.location.href = "/admin/login.html"; return; }
+    document.getElementById('usuarioLogado').textContent = user.email;
+    carregarClientes();
+  });
 
-    const mensagemEl = document.getElementById('mensagem');
-    const listaEl = document.getElementById('listaClientes');
-    const formEl = document.getElementById('formCliente');
+  document.getElementById('btnSair').addEventListener('click', async () => {
+    await signOut(auth);
+    window.location.href = "/admin/login.html";
+  });
 
-    // Proteger a página
-    onAuthStateChanged(auth, (user) => {
-      if (!user) {
-        window.location.href = "/admin/login.html";
+  function mostrarMensagem(texto, tipo = 'sucesso') {
+    mensagemEl.textContent = texto;
+    mensagemEl.className = tipo;
+    setTimeout(() => { mensagemEl.className = ''; mensagemEl.textContent = ''; }, 3500);
+  }
+
+  formEl.addEventListener('submit', async (e) => {
+    e.preventDefault();
+    try {
+      await addDoc(collection(db, 'clientes'), {
+        nome:         document.getElementById('nome').value,
+        telefone:     document.getElementById('telefone').value,
+        email:        document.getElementById('emailCliente').value,
+        cpf:          document.getElementById('cpf').value,
+        observacoes:  document.getElementById('observacoes').value,
+        criadoEm:     new Date()
+      });
+      mostrarMensagem('Cliente salvo com sucesso!');
+      formEl.reset();
+    } catch (error) {
+      console.error(error);
+      mostrarMensagem('Erro ao salvar cliente.', 'erro');
+    }
+  });
+
+  function carregarClientes() {
+    const q = query(collection(db, 'clientes'), orderBy('criadoEm', 'desc'));
+    onSnapshot(q, (snapshot) => {
+      if (snapshot.empty) {
+        listaEl.innerHTML = '<tr><td colspan="5" style="color:var(--gray);text-align:center;padding:24px;">Nenhum cliente cadastrado.</td></tr>';
         return;
       }
-      carregarClientes();
-    });
-
-    // Sair
-    document.getElementById('btnSair').addEventListener('click', async () => {
-      await signOut(auth);
-      window.location.href = "/admin/login.html";
-    });
-
-    // Salvar novo cliente
-    formEl.addEventListener('submit', async (e) => {
-      e.preventDefault();
-
-      const nome = document.getElementById('nome').value;
-      const telefone = document.getElementById('telefone').value;
-      const emailCliente = document.getElementById('emailCliente').value;
-      const cpf = document.getElementById('cpf').value;
-
-      try {
-        await addDoc(collection(db, 'clientes'), {
-          nome,
-          telefone,
-          email: emailCliente,
-          cpf,
-          criadoEm: new Date()
-        });
-
-        mensagemEl.textContent = 'Cliente salvo com sucesso!';
-        formEl.reset();
-
-        setTimeout(() => { mensagemEl.textContent = ''; }, 3000);
-
-      } catch (error) {
-        console.error(error);
-        mensagemEl.style.color = 'red';
-        mensagemEl.textContent = 'Erro ao salvar cliente.';
-      }
-    });
-
-    // Carregar lista de clientes em tempo real
-    function carregarClientes() {
-      const q = query(collection(db, 'clientes'), orderBy('criadoEm', 'desc'));
-
-      onSnapshot(q, (snapshot) => {
-        if (snapshot.empty) {
-          listaEl.innerHTML = '<tr><td colspan="4">Nenhum cliente cadastrado.</td></tr>';
-          return;
-        }
-
-        listaEl.innerHTML = '';
-        snapshot.forEach((doc) => {
-          const c = doc.data();
-          listaEl.innerHTML += `
-            <tr>
-              <td>${c.nome}</td>
-              <td>${c.telefone}</td>
-              <td>${c.email || '-'}</td>
-              <td>${c.cpf || '-'}</td>
-            </tr>
-          `;
-        });
+      listaEl.innerHTML = '';
+      snapshot.forEach((docSnap) => {
+        const c  = docSnap.data();
+        const id = docSnap.id;
+        const dados = JSON.stringify(c).replace(/\\/g, '\\\\').replace(/'/g, "\\'");
+        listaEl.innerHTML += `
+          <tr>
+            <td><strong>${c.nome}</strong></td>
+            <td>${c.telefone}</td>
+            <td>${c.email || '<span style="color:var(--gray)">-</span>'}</td>
+            <td>${c.cpf  || '<span style="color:var(--gray)">-</span>'}</td>
+            <td>
+              <div class="acoes">
+                <button class="btn btn-primary btn-sm" onclick="abrirEdicao('${id}', ${dados})">
+                  <i class="fas fa-edit"></i> Editar
+                </button>
+                <button class="btn btn-danger btn-sm" onclick="excluirCliente('${id}', '${c.nome.replace(/'/g,"\\'")}')">
+                  <i class="fas fa-trash"></i> Excluir
+                </button>
+              </div>
+            </td>
+          </tr>`;
       });
+    });
+  }
+
+  window.abrirEdicao = (id, cliente) => {
+    clienteEditandoId = id;
+    document.getElementById('editNome').value        = cliente.nome        || '';
+    document.getElementById('editTelefone').value    = cliente.telefone    || '';
+    document.getElementById('editEmail').value       = cliente.email       || '';
+    document.getElementById('editCpf').value         = cliente.cpf         || '';
+    document.getElementById('editObservacoes').value = cliente.observacoes || '';
+    modalOverlay.classList.add('ativo');
+  };
+
+  document.getElementById('btnCancelarEdicao').addEventListener('click', () => {
+    modalOverlay.classList.remove('ativo');
+    clienteEditandoId = null;
+  });
+
+  document.getElementById('btnSalvarEdicao').addEventListener('click', async () => {
+    if (!clienteEditandoId) return;
+    try {
+      await updateDoc(doc(db, 'clientes', clienteEditandoId), {
+        nome:        document.getElementById('editNome').value,
+        telefone:    document.getElementById('editTelefone').value,
+        email:       document.getElementById('editEmail').value,
+        cpf:         document.getElementById('editCpf').value,
+        observacoes: document.getElementById('editObservacoes').value,
+      });
+      mostrarMensagem('Cliente atualizado com sucesso!');
+      modalOverlay.classList.remove('ativo');
+      clienteEditandoId = null;
+    } catch (error) {
+      console.error(error);
+      mostrarMensagem('Erro ao atualizar cliente.', 'erro');
     }
-  </script>
+  });
+
+  window.excluirCliente = async (id, nome) => {
+    if (!confirm(`Excluir o cliente "${nome}"?`)) return;
+    try {
+      await deleteDoc(doc(db, 'clientes', id));
+      mostrarMensagem('Cliente excluído com sucesso!');
+    } catch (error) {
+      console.error(error);
+      mostrarMensagem('Erro ao excluir cliente.', 'erro');
+    }
+  };
+</script>
 
 </body>
 </html>

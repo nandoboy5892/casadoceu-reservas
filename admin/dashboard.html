@@ -2,39 +2,259 @@
 <html lang="pt-BR">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Dashboard - Casa do Céu</title>
+  <link rel="icon" href="https://i.imgur.com/Tgntdk2.png" type="image/png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700;800&family=Quicksand:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+  <style>
+    :root {
+      --primary: #0077cc;
+      --primary-dark: #005fa3;
+      --light: #f8f9fa;
+      --dark: #212529;
+      --gray: #6c757d;
+      --white: #ffffff;
+      --shadow: 0 4px 12px rgba(0,0,0,0.1);
+      --transition: all 0.3s ease;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Quicksand', sans-serif;
+      background: var(--light);
+      color: var(--dark);
+    }
+
+    nav {
+      background: var(--white);
+      box-shadow: var(--shadow);
+      padding: 1rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .nav-logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-family: 'Montserrat', sans-serif;
+      font-weight: 800;
+      font-size: 1.1rem;
+      color: var(--primary);
+      text-decoration: none;
+    }
+
+    .nav-logo img { height: 30px; }
+
+    .nav-right {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      font-size: 0.85rem;
+      color: var(--gray);
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 18px;
+      border-radius: 50px;
+      border: none;
+      font-family: 'Quicksand', sans-serif;
+      font-weight: 600;
+      font-size: 0.85rem;
+      cursor: pointer;
+      text-decoration: none;
+      transition: var(--transition);
+    }
+
+    .btn-primary { background: var(--primary); color: var(--white); }
+    .btn-primary:hover { background: var(--primary-dark); transform: translateY(-2px); }
+    .btn-outline {
+      background: transparent;
+      border: 2px solid var(--primary);
+      color: var(--primary);
+    }
+    .btn-outline:hover { background: var(--primary); color: var(--white); transform: translateY(-2px); }
+
+    .container {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 40px 24px;
+    }
+
+    .page-title {
+      font-family: 'Montserrat', sans-serif;
+      font-weight: 700;
+      font-size: 1.8rem;
+      color: var(--primary);
+      margin-bottom: 8px;
+      position: relative;
+      display: inline-block;
+    }
+
+    .page-title::after {
+      content: '';
+      position: absolute;
+      bottom: -8px;
+      left: 0;
+      width: 60px;
+      height: 4px;
+      background: var(--primary);
+      border-radius: 2px;
+    }
+
+    .page-subtitle {
+      color: var(--gray);
+      margin-top: 16px;
+      margin-bottom: 36px;
+      font-size: 0.95rem;
+    }
+
+    .cards-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 20px;
+    }
+
+    .card {
+      background: var(--white);
+      border-radius: 12px;
+      padding: 28px 24px;
+      box-shadow: var(--shadow);
+      text-decoration: none;
+      color: var(--dark);
+      transition: var(--transition);
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .card:hover {
+      transform: translateY(-5px);
+      box-shadow: 0 12px 24px rgba(0,0,0,0.12);
+    }
+
+    .card-icon {
+      width: 50px;
+      height: 50px;
+      border-radius: 12px;
+      background: rgba(0,119,204,0.1);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.4rem;
+      color: var(--primary);
+    }
+
+    .card h3 {
+      font-family: 'Montserrat', sans-serif;
+      font-weight: 700;
+      font-size: 1rem;
+      color: var(--dark);
+    }
+
+    .card p {
+      font-size: 0.85rem;
+      color: var(--gray);
+      line-height: 1.5;
+    }
+
+    .card-arrow {
+      margin-top: auto;
+      font-size: 0.85rem;
+      color: var(--primary);
+      font-weight: 600;
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .user-badge {
+      background: rgba(0,119,204,0.08);
+      color: var(--primary);
+      padding: 4px 12px;
+      border-radius: 50px;
+      font-size: 0.8rem;
+      font-weight: 600;
+    }
+
+    @media (max-width: 600px) {
+      nav { padding: 1rem; }
+      .container { padding: 24px 16px; }
+    }
+  </style>
 </head>
 <body>
-  <h1>Dashboard - Casa do Céu</h1>
 
-  <p id="usuario-info"></p>
+<nav>
+  <a href="/admin/dashboard.html" class="nav-logo">
+    <img src="https://i.imgur.com/Tgntdk2.png" alt="Logo Casa do Céu">
+    <span>Casa do Céu</span>
+  </a>
+  <div class="nav-right">
+    <span class="user-badge"><i class="fas fa-user"></i> <span id="usuarioLogado"></span></span>
+    <button class="btn btn-outline" id="btnSair">
+      <i class="fas fa-sign-out-alt"></i> Sair
+    </button>
+  </div>
+</nav>
 
-  <button id="btnLogout">Sair</button>
+<div class="container">
+  <h1 class="page-title">Dashboard</h1>
+  <p class="page-subtitle">Gerencie clientes e reservas da Casa do Céu</p>
 
-  <script type="module">
-    import { auth } from "../assets/js/firebase.js";
-    import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
+  <div class="cards-grid">
+    <a href="/admin/clientes.html" class="card">
+      <div class="card-icon"><i class="fas fa-users"></i></div>
+      <h3>Clientes</h3>
+      <p>Cadastre, edite e visualize todos os clientes da Casa do Céu.</p>
+      <span class="card-arrow">Acessar <i class="fas fa-arrow-right"></i></span>
+    </a>
 
-    const usuarioInfoEl = document.getElementById('usuario-info');
-    const btnLogout = document.getElementById('btnLogout');
+    <a href="/admin/reservas.html" class="card">
+      <div class="card-icon"><i class="fas fa-calendar-check"></i></div>
+      <h3>Reservas</h3>
+      <p>Gerencie as reservas, datas de entrada e saída e valores.</p>
+      <span class="card-arrow">Acessar <i class="fas fa-arrow-right"></i></span>
+    </a>
 
-    // 1) Verificar se o usuário está logado
-    onAuthStateChanged(auth, (user) => {
-      if (!user) {
-        // Não está logado → volta para o login
-        window.location.href = "/admin/login.html";
-        return;
-      }
+    <a href="https://www.casadoceu.com.br" target="_blank" class="card">
+      <div class="card-icon"><i class="fas fa-globe"></i></div>
+      <h3>Site Público</h3>
+      <p>Visualize o site público da Casa do Céu como os clientes veem.</p>
+      <span class="card-arrow">Abrir <i class="fas fa-external-link-alt"></i></span>
+    </a>
+  </div>
+</div>
 
-      // Está logado → mostra info básica
-      usuarioInfoEl.textContent = `Você está logado como: ${user.email}`;
-    });
+<script type="module">
+  import { auth } from "../assets/js/firebase.js";
+  import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
 
-    // 2) Botão de sair
-    btnLogout.addEventListener('click', async () => {
-      await signOut(auth);
+  onAuthStateChanged(auth, (user) => {
+    if (!user) {
       window.location.href = "/admin/login.html";
-    });
-  </script>
+      return;
+    }
+    document.getElementById('usuarioLogado').textContent = user.email;
+  });
+
+  document.getElementById('btnSair').addEventListener('click', async () => {
+    await signOut(auth);
+    window.location.href = "/admin/login.html";
+  });
+</script>
+
 </body>
 </html>
