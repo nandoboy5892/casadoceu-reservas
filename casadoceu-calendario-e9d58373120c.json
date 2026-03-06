@@ -1,0 +1,13 @@
+{
+  "type": "service_account",
+  "project_id": "casadoceu-calendario",
+  "private_key_id": "e9d58373120c6ad522595ca2e692c7b3303b6805",
+  "private_key": "-----BEGIN PRIVATE KEY-----\nMIIEuwIBADANBgkqhkiG9w0BAQEFAASCBKUwggShAgEAAoIBAQCvjcWXaPAPIMbP\nY1w2DAlfQ+5AvCePza3Avshq6olAPj3xzK1a08ohlEfuft4ks5E1gSe+/6gkqYIt\nmrOSz1pGWxTyqi/gnUoATUkC3zLC5RPmEZkUvWCyrzdZBYTRIq0R4Ct0G8wUNG/G\nGelv79xfrAyG6oHGhnu9WvXxdJF+BJHl2dU1AIn6AVF316JUmAyCEG+5kmS1H9c6\ncGZ0xiFnbFtVbECpfqZBoTJYtyK7f7V2OnDneAyh2+9Ektg3W4PPLjt9Jb5ys1af\n3UU8m0P4XW8KqbKXaYuqcc+G/sYx+BqoAA5+aMdxJDX2CbNPYURCIGXGTwWnHAmt\nFfIew0dJAgMBAAECgf8SHXmw5g3fgcJXeX6fv8jidmAKI2BHC9z3cWMST/avFRJ5\n9mTtD8ML3qvi2wnmlPZRpGzgM1a7xxdnx/mVF1B5chdMncMoVRK4dUEoyrSyPRvl\n4cBUzjXsOlMRHJYCqVFdRtnftqlDFyYcNbr2PLTA1UAgVpKNqdLwTIfpzTLg40FH\n0wG8ou0FLB+F5Xfob+M+nGbUMabn+qiICZyEvg6uiH0rf/XV7ckD5fJQmnILEyCX\n9uJC3Rvrjb3rNhVf23v6JS3hUmbhkJ+qCHRCNJ6S6T32sJ63KBH4neg6fbld6Rw3\nvogx2jIS3vsTGR2CmJUXW6xVScB3E/g1eVVUNqECgYEA5Vfa6E1J7QqNdzenx114\njfQLX1EnUN8xjTWeNcXl6npke24As8yof8xV9XeqWRWP8FeHaaTXRLGaJmoGE0yE\nLNbvNvKt2cgsi8G/frCdpVFoatjEavRY+I6UEt3rXfRYR86T68jF8BTVL+bdWC1E\nqCVgsb2mVsOxB27snnuXglECgYEAw/VnjDZGZh4lvoPVfZF6TsNVNiOn1K60U5uN\nxyfQIqnuzPoaVrv+Kjr8d2HHPIShZc956M8rU1IC1tljj5g8Cj0/7OAPZ/K40LkQ\ng+woy5dRP43PeQIZ64MJt7Lx8ueGNCEXV8ryPQYPgVZIZWPmadff3coLMOA4w7PO\neEXY/3kCgYAJG+sy7Nbx1kh2IrzEO18tbDMDbyq7mJHURPvqsNiH7qKNEHpwqcFL\niicj38PhU+zqo99Z/9UZAmDYA8AIBjL9wO+xZAQpsTyrtF9RvdwVE92s2L08bkYW\nYTtaYHwXuDvFZlwTsl7CQWGSTH4gIXQnpYxootq3eYBPhkVZqhkDcQKBgD8q7nQu\nUsc8VKJzUPCnYqvdH6zSFZnjr1F8RVm7pcZmzQnaXX80HpxyY0wAgv8pKfXtybiY\nf7jeKPglH4j8Y+5RDDhJie3SOm1eGsrL5+KpJpG8HvM9ECnxFcLXtlK8+2/2ctXk\nH+438+uXasL0TyQzaIDQToc04FeFsLromSjRAoGBAJ76UEMks9iorxkumD4KcCZD\nRQsXGZDOhbwtjtVFBLjAIWAuaBqqBaYNLktmYVj7MDfrwSvKVYa2APF7S/Bn2VM2\nNRAb86+/eFprgAAhTeged/gcP1bSgY4ywXIWUYkuAvzjT0+JuP2h36UxBc9vopat\nwN7RUMTBoaS+luFistl4\n-----END PRIVATE KEY-----\n",
+  "client_email": "casadoceu-calendario-900@casadoceu-calendario.iam.gserviceaccount.com",
+  "client_id": "101057120623768673642",
+  "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+  "token_uri": "https://oauth2.googleapis.com/token",
+  "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+  "client_x509_cert_url": "https://www.googleapis.com/robot/v1/metadata/x509/casadoceu-calendario-900%40casadoceu-calendario.iam.gserviceaccount.com",
+  "universe_domain": "googleapis.com"
+}
