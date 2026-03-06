@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Reservas - Casa do Céu</title>
+  <link rel="icon" href="https://i.imgur.com/Tgntdk2.png" type="image/png">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@500;600;700;800&family=Quicksand:wght@400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+
+  <style>
+    :root {
+      --primary: #0077cc;
+      --primary-dark: #005fa3;
+      --light: #f8f9fa;
+      --dark: #212529;
+      --gray: #6c757d;
+      --white: #ffffff;
+      --shadow: 0 4px 12px rgba(0,0,0,0.1);
+      --transition: all 0.3s ease;
+    }
+
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+
+    body {
+      font-family: 'Quicksand', sans-serif;
+      background: var(--light);
+      color: var(--dark);
+    }
+
+    nav {
+      background: var(--white);
+      box-shadow: var(--shadow);
+      padding: 1rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+    }
+
+    .nav-logo {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      font-family: 'Montserrat', sans-serif;
+      font-weight: 800;
+      font-size: 1.1rem;
+      color: var(--primary);
+      text-decoration: none;
+    }
+
+    .nav-logo img { height: 30px; }
+
+    .nav-right {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 18px;
+      border-radius: 50px;
+      border: none;
+      font-family: 'Quicksand', sans-serif;
+      font-weight: 600;
+      font-size: 0.85rem;
+      cursor: pointer;
+      text-decoration: none;
+      transition: var(--transition);
+    }
+
+    .btn-primary { background: var(--primary); color: var(--white); }
+    .btn-primary:hover { background: var(--primary-dark); transform: translateY(-2px); }
+
+    .btn-outline {
+      background: transparent;
+      border: 2px solid var(--primary);
+      color: var(--primary);
+    }
+    .btn-outline:hover { background: var(--primary); color: var(--white); }
+
+    .btn-danger { background: #dc3545; color: var(--white); }
+    .btn-danger:hover { background: #b02a37; transform: translateY(-2px); }
+
+    .btn-sm { padding: 5px 12px; font-size: 0.78rem; }
+
+    .container {
+      max-width: 1100px;
+      margin: 0 auto;
+      padding: 40px 24px;
+    }
+
+    .page-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      margin-bottom: 32px;
+      flex-wrap: wrap;
+      gap: 16px;
+    }
+
+    .page-title {
+      font-family: 'Montserrat', sans-serif;
+      font-weight: 700;
+      font-size: 1.8rem;
+      color: var(--primary);
+      position: relative;
+      display: inline-block;
+    }
+
+    .page-title::after {
+      content: '';
+      position: absolute;
+      bottom: -8px;
+      left: 0;
+      width: 60px;
+      height: 4px;
+      background: var(--primary);
+      border-radius: 2px;
+    }
+
+    .page-subtitle {
+      color: var(--gray);
+      margin-top: 12px;
+      font-size: 0.9rem;
+    }
+
+    .card {
+      background: var(--white);
+      border-radius: 12px;
+      padding: 28px 24px;
+      box-shadow: var(--shadow);
+      margin-bottom: 24px;
+    }
+
+    .card h2 {
+      font-family: 'Montserrat', sans-serif;
+      font-weight: 700;
+      font-size: 1rem;
+      color: var(--primary);
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .form-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 16px;
+    }
+
+    .form-full { grid-column: 1 / -1; }
+
+    .form-group { display: flex; flex-direction: column; gap: 5px; }
+
+    label {
+      font-weight: 600;
+      font-size: 0.85rem;
+      color: var(--dark);
+    }
+
+    input, textarea, select {
+      padding: 10px 12px;
+      border: 1px solid #dee2e6;
+      border-radius: 8px;
+      font-family: 'Quicksand', sans-serif;
+      font-size: 0.9rem;
+      background: var(--light);
+      color: var(--dark);
+      transition: var(--transition);
+      outline: none;
+    }
+
+    input:focus, textarea:focus, select:focus {
+      border-color: var(--primary);
+      background: var(--white);
+      box-shadow: 0 0 0 3px rgba(0,119,204,0.12);
+    }
+
+    textarea { resize: vertical; min-height: 70px; }
+
+    .form-actions { margin-top: 20px; }
+
+    #mensagem {
+      padding: 10px 16px;
+      border-radius: 8px;
+      font-size: 0.88rem;
+      font-weight: 600;
+      margin-bottom: 16px;
+      display: none;
+    }
+
+    #mensagem.sucesso { background: #d1e7dd; color: #0a3622; display: block; }
+    #mensagem.erro    { background: #f8d7da; color: #58151c; display: block; }
+
+    .user-badge {
+      background: rgba(0,119,204,0.08);
+      color: var(--primary);
+      padding: 4px 12px;
+      border-radius: 50px;
+      font-size: 0.8rem;
+      font-weight: 600;
+    }
+
+    .list-toolbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .contador {
+      font-size: 0.85rem;
+      color: var(--gray);
+      font-weight: 600;
+    }
+
+    .search-box {
+      position: relative;
+      width: 260px;
+    }
+
+    .search-box input {
+      width: 100%;
+      padding-left: 34px;
+    }
+
+    .search-box i {
+      position: absolute;
+      left: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--gray);
+      font-size: 0.85rem;
+    }
+
+    .table-wrapper { overflow-x: auto; }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.88rem;
+    }
+
+    th {
+      background: var(--primary);
+      color: var(--white);
+      padding: 12px 14px;
+      text-align: left;
+      font-family: 'Montserrat', sans-serif;
+      font-weight: 600;
+    }
+
+    th:first-child { border-radius: 8px 0 0 0; }
+    th:last-child  { border-radius: 0 8px 0 0; }
+
+    td {
+      padding: 12px 14px;
+      border-bottom: 1px solid #f0f0f0;
+      vertical-align: middle;
+    }
+
+    tr:hover td { background: #f0f6fc; }
+
+    .status-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 4px 10px;
+      border-radius: 50px;
+      font-size: 0.8rem;
+      font-weight: 600;
+    }
+
+    .status-pendente {
+      background: #fff3cd;
+      color: #856404;
+    }
+
+    .status-confirmada {
+      background: #d1e7dd;
+      color: #0f5132;
+    }
+
+    .status-cancelada {
+      background: #f8d7da;
+      color: #842029;
+    }
+
+    .acoes { display: flex; gap: 6px; flex-wrap: wrap; }
+
+    .paginacao {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 8px;
+      margin-top: 20px;
+      flex-wrap: wrap;
+    }
+
+    .paginacao button {
+      padding: 6px 14px;
+      border-radius: 50px;
+      border: 2px solid var(--primary);
+      background: transparent;
+      color: var(--primary);
+      font-family: 'Quicksand', sans-serif;
+      font-weight: 600;
+      font-size: 0.82rem;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+
+    .paginacao button:hover,
+    .paginacao button.ativo {
+      background: var(--primary);
+      color: var(--white);
+    }
+
+    .paginacao button:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+
+    .paginacao-info {
+      font-size: 0.82rem;
+      color: var(--gray);
+    }
+
+    @media (max-width: 700px) {
+      .form-grid { grid-template-columns: 1fr; }
+      nav { padding: 1rem; }
+      .container { padding: 24px 16px; }
+      .search-box { width: 100%; }
+      .list-toolbar { flex-direction: column; align-items: flex-start; }
+    }
+  </style>
+</head>
+<body>
+
+<nav>
+  <a href="/admin/dashboard.html" class="nav-logo">
+    <img src="https://i.imgur.com/Tgntdk2.png" alt="Logo Casa do Céu">
+    <span>Casa do Céu</span>
+  </a>
+  <div class="nav-right">
+    <span class="user-badge"><i class="fas fa-user"></i> <span id="usuarioLogado"></span></span>
+    <a href="/admin/dashboard.html" class="btn btn-outline">
+      <i class="fas fa-arrow-left"></i> Dashboard
+    </a>
+    <button class="btn btn-outline" id="btnSair">
+      <i class="fas fa-sign-out-alt"></i> Sair
+    </button>
+  </div>
+</nav>
+
+<div class="container">
+
+  <div class="page-header">
+    <div>
+      <h1 class="page-title">Reservas</h1>
+      <p class="page-subtitle">Cadastre e gerencie as reservas da Casa do Céu</p>
+    </div>
+  </div>
+
+  <div id="mensagem"></div>
+
+  <!-- NOVA RESERVA -->
+  <div class="card">
+    <h2><i class="fas fa-calendar-plus"></i> Nova Reserva</h2>
+    <form id="formReserva">
+      <div class="form-grid">
+        <div class="form-group form-full">
+          <label>Cliente *</label>
+          <select id="clienteId" required>
+            <option value="">Selecione um cliente...</option>
+          </select>
+        </div>
+
+        <div class="form-group">
+          <label>Data de entrada *</label>
+          <input type="date" id="dataEntrada" required>
+        </div>
+
+        <div class="form-group">
+          <label>Data de saída *</label>
+          <input type="date" id="dataSaida" required>
+        </div>
+
+        <div class="form-group">
+          <label>Nº de hóspedes</label>
+          <input type="number" id="hospedes" min="1" placeholder="Ex: 10">
+        </div>
+
+        <div class="form-group">
+          <label>Valor (R$)</label>
+          <input type="number" id="valor" min="0" step="0.01" placeholder="Ex: 1899,90">
+        </div>
+
+        <div class="form-group">
+          <label>Status</label>
+          <select id="status">
+            <option value="pendente">Pendente</option>
+            <option value="confirmada">Confirmada</option>
+            <option value="cancelada">Cancelada</option>
+          </select>
+        </div>
+
+        <div class="form-group form-full">
+          <label>Observações</label>
+          <textarea id="obsReserva" placeholder="Informações adicionais desta reserva..."></textarea>
+        </div>
+      </div>
+
+      <div class="form-actions">
+        <button type="submit" class="btn btn-primary">
+          <i class="fas fa-save"></i> Salvar Reserva
+        </button>
+      </div>
+    </form>
+  </div>
+
+  <!-- LISTA DE RESERVAS -->
+  <div class="card">
+    <h2><i class="fas fa-calendar-check"></i> Reservas Cadastradas</h2>
+
+    <div class="list-toolbar">
+      <span class="contador" id="contadorReservas">0 reservas</span>
+      <div class="search-box">
+        <i class="fas fa-search"></i>
+        <input type="text" id="busca" placeholder="Buscar por cliente ou status">
+      </div>
+    </div>
+
+    <div class="table-wrapper">
+      <table>
+        <thead>
+          <tr>
+            <th>Cliente</th>
+            <th>Período</th>
+            <th>Hóspedes</th>
+            <th>Valor</th>
+            <th>Status</th>
+            <th>Ações</th>
+          </tr>
+        </thead>
+        <tbody id="listaReservas">
+          <tr><td colspan="6" style="color:var(--gray);text-align:center;padding:24px
+
