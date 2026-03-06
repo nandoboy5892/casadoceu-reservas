@@ -154,6 +154,17 @@
       gap: 8px;
     }
 
+    .layout-duas-colunas {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 24px;
+      margin-bottom: 24px;
+    }
+
+    .layout-duas-colunas .card {
+      margin-bottom: 0;
+    }
+
     .form-grid {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -336,6 +347,31 @@
       color: var(--gray);
     }
 
+    .calendario-wrapper {
+      border-radius: 10px;
+      overflow: hidden;
+      border: 1px solid #dee2e6;
+      height: 100%;
+      min-height: 500px;
+    }
+
+    .calendario-wrapper iframe {
+      width: 100%;
+      height: 100%;
+      min-height: 500px;
+      border: 0;
+      display: block;
+    }
+
+    .calendario-info {
+      font-size: 0.82rem;
+      color: var(--gray);
+      margin-bottom: 12px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
     /* Modal */
     .modal-overlay {
       display: none;
@@ -385,6 +421,12 @@
       to   { opacity: 1; transform: translateY(0); }
     }
 
+    @media (max-width: 900px) {
+      .layout-duas-colunas {
+        grid-template-columns: 1fr;
+      }
+    }
+
     @media (max-width: 700px) {
       .form-grid { grid-template-columns: 1fr; }
       nav { padding: 1rem; }
@@ -423,60 +465,82 @@
 
   <div id="mensagem"></div>
 
-  <!-- NOVA RESERVA -->
-  <div class="card">
-    <h2><i class="fas fa-calendar-plus"></i> Nova Reserva</h2>
-    <form id="formReserva">
-      <div class="form-grid">
+  <!-- FORMULÁRIO + CALENDÁRIO LADO A LADO -->
+  <div class="layout-duas-colunas">
 
-        <div class="form-group form-full">
-          <label>Cliente *</label>
-          <select id="clienteId" required>
-            <option value="">Carregando clientes...</option>
-          </select>
+    <!-- NOVA RESERVA -->
+    <div class="card">
+      <h2><i class="fas fa-calendar-plus"></i> Nova Reserva</h2>
+      <form id="formReserva">
+        <div class="form-grid">
+
+          <div class="form-group form-full">
+            <label>Cliente *</label>
+            <select id="clienteId" required>
+              <option value="">Carregando clientes...</option>
+            </select>
+          </div>
+
+          <div class="form-group">
+            <label>Data de entrada *</label>
+            <input type="date" id="dataEntrada" required>
+          </div>
+
+          <div class="form-group">
+            <label>Data de saída *</label>
+            <input type="date" id="dataSaida" required>
+          </div>
+
+          <div class="form-group">
+            <label>Nº de hóspedes</label>
+            <input type="number" id="hospedes" min="1" placeholder="Ex: 10">
+          </div>
+
+          <div class="form-group">
+            <label>Valor (R$)</label>
+            <input type="number" id="valor" min="0" step="0.01" placeholder="Ex: 1899.90">
+          </div>
+
+          <div class="form-group form-full">
+            <label>Status</label>
+            <select id="status">
+              <option value="pendente">Pendente</option>
+              <option value="confirmada">Confirmada</option>
+              <option value="cancelada">Cancelada</option>
+            </select>
+          </div>
+
+          <div class="form-group form-full">
+            <label>Observações</label>
+            <textarea id="obsReserva" placeholder="Informações adicionais desta reserva..."></textarea>
+          </div>
+
         </div>
-
-        <div class="form-group">
-          <label>Data de entrada *</label>
-          <input type="date" id="dataEntrada" required>
+        <div class="form-actions">
+          <button type="submit" class="btn btn-primary">
+            <i class="fas fa-save"></i> Salvar Reserva
+          </button>
         </div>
+      </form>
+    </div>
 
-        <div class="form-group">
-          <label>Data de saída *</label>
-          <input type="date" id="dataSaida" required>
-        </div>
-
-        <div class="form-group">
-          <label>Nº de hóspedes</label>
-          <input type="number" id="hospedes" min="1" placeholder="Ex: 10">
-        </div>
-
-        <div class="form-group">
-          <label>Valor (R$)</label>
-          <input type="number" id="valor" min="0" step="0.01" placeholder="Ex: 1899.90">
-        </div>
-
-        <div class="form-group">
-          <label>Status</label>
-          <select id="status">
-            <option value="pendente">Pendente</option>
-            <option value="confirmada">Confirmada</option>
-            <option value="cancelada">Cancelada</option>
-          </select>
-        </div>
-
-        <div class="form-group form-full">
-          <label>Observações</label>
-          <textarea id="obsReserva" placeholder="Informações adicionais desta reserva..."></textarea>
-        </div>
-
+    <!-- CALENDÁRIO GOOGLE -->
+    <div class="card">
+      <h2><i class="fas fa-calendar-alt"></i> Calendário de Disponibilidade</h2>
+      <p class="calendario-info">
+        <i class="fas fa-info-circle"></i>
+        As datas em azul já estão reservadas. Após salvar uma reserva, atualize a página para ver no calendário.
+      </p>
+      <div class="calendario-wrapper">
+        <iframe
+          id="iframeCalendario"
+          src="https://calendar.google.com/calendar/embed?src=14b75b7ed5bc14409ed4370be8284163994de0e879e9c7322e75231a5a7c56cd%40group.calendar.google.com&ctz=America%2FSao_Paulo&mode=MONTH&showTitle=0&showNav=1&showDate=1&showPrint=0&showTabs=0&showCalendars=0&showTz=0&hl=pt_BR"
+          frameborder="0"
+          scrolling="no">
+        </iframe>
       </div>
-      <div class="form-actions">
-        <button type="submit" class="btn btn-primary">
-          <i class="fas fa-save"></i> Salvar Reserva
-        </button>
-      </div>
-    </form>
+    </div>
+
   </div>
 
   <!-- LISTA -->
@@ -523,7 +587,7 @@
 
 </div>
 
-<!-- Modal edição de reserva -->
+<!-- Modal edição -->
 <div class="modal-overlay" id="modalOverlay">
   <div class="modal">
     <h2><i class="fas fa-calendar-alt"></i> Editar Reserva</h2>
@@ -586,7 +650,6 @@
     doc, deleteDoc, getDocs, updateDoc
   } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-  // Elementos
   const mensagemEl    = document.getElementById('mensagem');
   const formReserva   = document.getElementById('formReserva');
   const clienteSelect = document.getElementById('clienteId');
@@ -596,12 +659,13 @@
   const filtroStatus  = document.getElementById('filtroStatus');
   const paginacaoEl   = document.getElementById('paginacao');
   const modalOverlay  = document.getElementById('modalOverlay');
+  const iframeCalendario = document.getElementById('iframeCalendario');
 
-  let reservas        = [];
-  let clientesPorId   = {};
+  let reservas          = [];
+  let clientesPorId     = {};
   let reservaEditandoId = null;
-  const POR_PAGINA    = 10;
-  let paginaAtual     = 1;
+  const POR_PAGINA      = 10;
+  let paginaAtual       = 1;
 
   // Protege página
   onAuthStateChanged(auth, async (user) => {
@@ -622,7 +686,14 @@
   function mostrarMensagem(texto, tipo = 'sucesso') {
     mensagemEl.textContent = texto;
     mensagemEl.className = tipo;
-    setTimeout(() => { mensagemEl.className = ''; mensagemEl.textContent = ''; }, 3500);
+    setTimeout(() => { mensagemEl.className = ''; mensagemEl.textContent = ''; }, 4000);
+  }
+
+  // Recarrega o iframe do calendário para refletir novos eventos
+  function recarregarCalendario() {
+    const src = iframeCalendario.src;
+    iframeCalendario.src = '';
+    setTimeout(() => { iframeCalendario.src = src; }, 500);
   }
 
   // ── Carregar clientes ──
@@ -630,12 +701,11 @@
     try {
       const snap = await getDocs(collection(db, 'clientes'));
       clientesPorId = {};
-
-      const options = ['<option value="">Selecione um cliente...</option>'];
+      const options     = ['<option value="">Selecione um cliente...</option>'];
       const optionsEdit = ['<option value="">Selecione um cliente...</option>'];
 
       snap.forEach((docSnap) => {
-        const c = docSnap.data();
+        const c    = docSnap.data();
         clientesPorId[docSnap.id] = c;
         const nome = c.nome || '(sem nome)';
         options.push(`<option value="${docSnap.id}">${nome}</option>`);
@@ -644,15 +714,14 @@
 
       clienteSelect.innerHTML = options.join('');
       document.getElementById('editClienteId').innerHTML = optionsEdit.join('');
-
     } catch (erro) {
       console.error("Erro ao carregar clientes:", erro);
       clienteSelect.innerHTML = '<option value="">Erro ao carregar clientes</option>';
-      mostrarMensagem("Erro ao carregar clientes. Verifique as regras do Firestore.", "erro");
+      mostrarMensagem("Erro ao carregar clientes.", "erro");
     }
   }
 
-  // ── Salvar nova reserva ──
+  // ── Salvar nova reserva + Google Calendar ──
   formReserva.addEventListener('submit', async (e) => {
     e.preventDefault();
 
@@ -664,23 +733,16 @@
     const status      = document.getElementById('status').value;
     const obs         = document.getElementById('obsReserva').value.trim();
 
-    if (!clienteId) {
-      mostrarMensagem('Selecione um cliente.', 'erro');
-      return;
-    }
-
-    if (!dataEntrada || !dataSaida) {
-      mostrarMensagem('Preencha as datas de entrada e saída.', 'erro');
-      return;
-    }
-
-    if (dataSaida < dataEntrada) {
-      mostrarMensagem('A data de saída não pode ser anterior à data de entrada.', 'erro');
-      return;
-    }
+    if (!clienteId) { mostrarMensagem('Selecione um cliente.', 'erro'); return; }
+    if (!dataEntrada || !dataSaida) { mostrarMensagem('Preencha as datas.', 'erro'); return; }
+    if (dataSaida < dataEntrada) { mostrarMensagem('A data de saída não pode ser anterior à entrada.', 'erro'); return; }
 
     try {
-      await addDoc(collection(db, 'reservas'), {
+      const cliente     = clientesPorId[clienteId] || {};
+      const nomeCliente = cliente.nome || 'Cliente';
+
+      // 1) Salva no Firestore
+      const docRef = await addDoc(collection(db, 'reservas'), {
         clienteId,
         dataEntrada,
         dataSaida,
@@ -691,10 +753,42 @@
         criadoEm:    new Date()
       });
 
-      mostrarMensagem('Reserva salva com sucesso!');
+      // 2) Cria evento no Google Calendar via Netlify Function
+      try {
+        const resp = await fetch('/.netlify/functions/criar-evento', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            titulo:    `Reserva – ${nomeCliente}`,
+            dataEntrada,
+            dataSaida,
+            descricao:
+              `Cliente: ${nomeCliente}\n` +
+              `Hóspedes: ${hospedes || '-'}\n` +
+              `Valor: ${valor ? 'R$ ' + valor : '-'}\n` +
+              `Status: ${status}\n` +
+              (obs ? `Obs: ${obs}` : '')
+          })
+        });
+
+        const result = await resp.json();
+        if (result.eventId) {
+          await updateDoc(doc(db, 'reservas', docRef.id), {
+            googleEventId: result.eventId
+          });
+        }
+      } catch (errCal) {
+        console.warn('Reserva salva, mas erro no Google Calendar:', errCal);
+      }
+
+      mostrarMensagem('Reserva salva e agenda atualizada!');
       formReserva.reset();
       clienteSelect.value = '';
       paginaAtual = 1;
+
+      // Recarrega o calendário para mostrar o novo evento
+      recarregarCalendario();
+
     } catch (error) {
       console.error("Erro ao salvar reserva:", error);
       mostrarMensagem('Erro ao salvar reserva.', 'erro');
@@ -717,8 +811,8 @@
     });
   }
 
-  buscaEl.addEventListener('input',          () => { paginaAtual = 1; renderizar(); });
-  filtroStatus.addEventListener('change',    () => { paginaAtual = 1; renderizar(); });
+  buscaEl.addEventListener('input',       () => { paginaAtual = 1; renderizar(); });
+  filtroStatus.addEventListener('change', () => { paginaAtual = 1; renderizar(); });
 
   // ── Renderizar tabela ──
   function renderizar() {
@@ -726,8 +820,8 @@
     const status = filtroStatus.value;
 
     let lista = reservas.filter((r) => {
-      const cliente = clientesPorId[r.clienteId] || {};
-      const nome    = (cliente.nome || '').toLowerCase();
+      const cliente     = clientesPorId[r.clienteId] || {};
+      const nome        = (cliente.nome || '').toLowerCase();
       const matchBusca  = !termo  || nome.includes(termo);
       const matchStatus = !status || r.status === status;
       return matchBusca && matchStatus;
@@ -735,7 +829,6 @@
 
     contadorEl.textContent = lista.length + (lista.length === 1 ? ' reserva' : ' reservas');
 
-    const total  = lista.length;
     const inicio = (paginaAtual - 1) * POR_PAGINA;
     const pagina = lista.slice(inicio, inicio + POR_PAGINA);
 
@@ -788,7 +881,7 @@
         </tr>`;
     });
 
-    renderizarPaginacao(total);
+    renderizarPaginacao(lista.length);
   }
 
   function renderizarPaginacao(total) {
@@ -827,7 +920,7 @@
     const r = reservas.find(x => x.id === id);
     if (!r) return;
     reservaEditandoId = id;
-    document.getElementById('editClienteId').value  = r.clienteId    || '';
+    document.getElementById('editClienteId').value   = r.clienteId   || '';
     document.getElementById('editDataEntrada').value = r.dataEntrada  || '';
     document.getElementById('editDataSaida').value   = r.dataSaida    || '';
     document.getElementById('editHospedes').value    = r.hospedes     || '';
@@ -859,6 +952,7 @@
       mostrarMensagem('Reserva atualizada com sucesso!');
       modalOverlay.classList.remove('ativo');
       reservaEditandoId = null;
+      recarregarCalendario();
     } catch (error) {
       console.error("Erro ao editar reserva:", error);
       mostrarMensagem('Erro ao atualizar reserva.', 'erro');
@@ -871,13 +965,13 @@
     try {
       await deleteDoc(doc(db, 'reservas', id));
       mostrarMensagem('Reserva excluída com sucesso!');
+      recarregarCalendario();
     } catch (error) {
       console.error("Erro ao excluir reserva:", error);
       mostrarMensagem('Erro ao excluir reserva.', 'erro');
     }
   };
 
-  // ── Formatar data ──
   function formatarData(valor) {
     if (!valor) return '-';
     const [ano, mes, dia] = valor.split('-');
