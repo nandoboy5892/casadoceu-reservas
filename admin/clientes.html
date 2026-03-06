@@ -92,7 +92,7 @@
     .btn-sm { padding: 5px 12px; font-size: 0.78rem; }
 
     .container {
-      max-width: 1000px;
+      max-width: 1100px;
       margin: 0 auto;
       padding: 40px 24px;
     }
@@ -201,6 +201,41 @@
     #mensagem.sucesso { background: #d1e7dd; color: #0a3622; display: block; }
     #mensagem.erro    { background: #f8d7da; color: #58151c; display: block; }
 
+    /* Barra de busca / contador */
+    .list-toolbar {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 14px;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .contador {
+      font-size: 0.85rem;
+      color: var(--gray);
+    }
+
+    .search-box {
+      position: relative;
+      max-width: 260px;
+      width: 100%;
+    }
+
+    .search-box input {
+      width: 100%;
+      padding-left: 34px;
+    }
+
+    .search-box i {
+      position: absolute;
+      left: 10px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--gray);
+      font-size: 0.85rem;
+    }
+
     table {
       width: 100%;
       border-collapse: collapse;
@@ -231,53 +266,6 @@
       border-radius: 50px;
       font-size: 0.8rem;
       font-weight: 600;
-    }
-
-    /* Modal */
-    .modal-overlay {
-      display: none;
-      position: fixed;
-      inset: 0;
-      background: rgba(0,0,0,0.5);
-      z-index: 999;
-      justify-content: center;
-      align-items: center;
-      padding: 20px;
-    }
-
-    .modal-overlay.ativo { display: flex; }
-
-    .modal {
-      background: var(--white);
-      border-radius: 12px;
-      padding: 32px 28px;
-      width: 100%;
-      max-width: 520px;
-      box-shadow: 0 20px 60px rgba(0,0,0,0.2);
-      animation: fadeInUp 0.3s ease;
-    }
-
-    .modal h2 {
-      font-family: 'Montserrat', sans-serif;
-      font-weight: 700;
-      font-size: 1.1rem;
-      color: var(--primary);
-      margin-bottom: 20px;
-      display: flex;
-      align-items: center;
-      gap: 8px;
-    }
-
-    .modal-botoes {
-      display: flex;
-      justify-content: flex-end;
-      gap: 10px;
-      margin-top: 20px;
-    }
-
-    @keyframes fadeInUp {
-      from { opacity: 0; transform: translateY(20px); }
-      to   { opacity: 1; transform: translateY(0); }
     }
 
     @media (max-width: 600px) {
@@ -354,6 +342,15 @@
   <!-- Lista -->
   <div class="card">
     <h2><i class="fas fa-users"></i> Clientes Cadastrados</h2>
+
+    <div class="list-toolbar">
+      <span class="contador" id="contadorClientes">0 clientes</span>
+      <div class="search-box">
+        <i class="fas fa-search"></i>
+        <input type="text" id="busca" placeholder="Buscar por nome, telefone ou e-mail">
+      </div>
+    </div>
+
     <table>
       <thead>
         <tr>
@@ -372,41 +369,6 @@
 
 </div>
 
-<!-- Modal edição -->
-<div class="modal-overlay" id="modalOverlay">
-  <div class="modal">
-    <h2><i class="fas fa-user-edit"></i> Editar Cliente</h2>
-    <div class="form-grid">
-      <div class="form-group form-full">
-        <label>Nome completo *</label>
-        <input type="text" id="editNome">
-      </div>
-      <div class="form-group">
-        <label>Telefone *</label>
-        <input type="tel" id="editTelefone">
-      </div>
-      <div class="form-group">
-        <label>E-mail</label>
-        <input type="email" id="editEmail">
-      </div>
-      <div class="form-group">
-        <label>CPF</label>
-        <input type="text" id="editCpf">
-      </div>
-      <div class="form-group form-full">
-        <label>Observações</label>
-        <textarea id="editObservacoes"></textarea>
-      </div>
-    </div>
-    <div class="modal-botoes">
-      <button class="btn btn-outline" id="btnCancelarEdicao">Cancelar</button>
-      <button class="btn btn-primary" id="btnSalvarEdicao">
-        <i class="fas fa-save"></i> Salvar alterações
-      </button>
-    </div>
-  </div>
-</div>
-
 <script type="module">
   import { auth, db } from "../assets/js/firebase.js";
   import { onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-auth.js";
@@ -415,12 +377,15 @@
     doc, updateDoc, deleteDoc
   } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-  const mensagemEl  = document.getElementById('mensagem');
-  const listaEl     = document.getElementById('listaClientes');
-  const formEl      = document.getElementById('formCliente');
-  const modalOverlay = document.getElementById('modalOverlay');
-  let clienteEditandoId = null;
+  const mensagemEl   = document.getElementById('mensagem');
+  const listaEl      = document.getElementById('listaClientes');
+  const formEl       = document.getElementById('formCliente');
+  const buscaEl      = document.getElementById('busca');
+  const contadorEl   = document.getElementById('contadorClientes');
 
+  let todosClientes = [];   // array com todos os clientes do Firestore
+
+  // Protege página
   onAuthStateChanged(auth, (user) => {
     if (!user) { window.location.href = "/admin/login.html"; return; }
     document.getElementById('usuarioLogado').textContent = user.email;
@@ -438,6 +403,7 @@
     setTimeout(() => { mensagemEl.className = ''; mensagemEl.textContent = ''; }, 3500);
   }
 
+  // Salvar novo cliente
   formEl.addEventListener('submit', async (e) => {
     e.preventDefault();
     try {
@@ -457,72 +423,100 @@
     }
   });
 
+  // Carregar clientes e manter em memória
   function carregarClientes() {
     const q = query(collection(db, 'clientes'), orderBy('criadoEm', 'desc'));
     onSnapshot(q, (snapshot) => {
-      if (snapshot.empty) {
-        listaEl.innerHTML = '<tr><td colspan="5" style="color:var(--gray);text-align:center;padding:24px;">Nenhum cliente cadastrado.</td></tr>';
-        return;
-      }
-      listaEl.innerHTML = '';
+      todosClientes = [];
       snapshot.forEach((docSnap) => {
-        const c  = docSnap.data();
-        const id = docSnap.id;
-        const dados = JSON.stringify(c).replace(/\\/g, '\\\\').replace(/'/g, "\\'");
-        listaEl.innerHTML += `
-          <tr>
-            <td><strong>${c.nome}</strong></td>
-            <td>${c.telefone}</td>
-            <td>${c.email || '<span style="color:var(--gray)">-</span>'}</td>
-            <td>${c.cpf  || '<span style="color:var(--gray)">-</span>'}</td>
-            <td>
-              <div class="acoes">
-                <button class="btn btn-primary btn-sm" onclick="abrirEdicao('${id}', ${dados})">
-                  <i class="fas fa-edit"></i> Editar
-                </button>
-                <button class="btn btn-danger btn-sm" onclick="excluirCliente('${id}', '${c.nome.replace(/'/g,"\\'")}')">
-                  <i class="fas fa-trash"></i> Excluir
-                </button>
-              </div>
-            </td>
-          </tr>`;
+        todosClientes.push({ id: docSnap.id, ...docSnap.data() });
       });
+      aplicarFiltroEAtualizarLista();
     });
   }
 
-  window.abrirEdicao = (id, cliente) => {
-    clienteEditandoId = id;
-    document.getElementById('editNome').value        = cliente.nome        || '';
-    document.getElementById('editTelefone').value    = cliente.telefone    || '';
-    document.getElementById('editEmail').value       = cliente.email       || '';
-    document.getElementById('editCpf').value         = cliente.cpf         || '';
-    document.getElementById('editObservacoes').value = cliente.observacoes || '';
-    modalOverlay.classList.add('ativo');
-  };
-
-  document.getElementById('btnCancelarEdicao').addEventListener('click', () => {
-    modalOverlay.classList.remove('ativo');
-    clienteEditandoId = null;
+  // Filtro de busca
+  buscaEl.addEventListener('input', () => {
+    aplicarFiltroEAtualizarLista();
   });
 
-  document.getElementById('btnSalvarEdicao').addEventListener('click', async () => {
-    if (!clienteEditandoId) return;
-    try {
-      await updateDoc(doc(db, 'clientes', clienteEditandoId), {
-        nome:        document.getElementById('editNome').value,
-        telefone:    document.getElementById('editTelefone').value,
-        email:       document.getElementById('editEmail').value,
-        cpf:         document.getElementById('editCpf').value,
-        observacoes: document.getElementById('editObservacoes').value,
+  function aplicarFiltroEAtualizarLista() {
+    const termo = buscaEl.value.trim().toLowerCase();
+
+    let filtrados = todosClientes;
+
+    if (termo) {
+      filtrados = todosClientes.filter((c) => {
+        const nome = (c.nome || '').toLowerCase();
+        const tel  = (c.telefone || '').toLowerCase();
+        const mail = (c.email || '').toLowerCase();
+        return (
+          nome.includes(termo) ||
+          tel.includes(termo)  ||
+          mail.includes(termo)
+        );
       });
+    }
+
+    atualizarTabela(filtrados);
+  }
+
+  function atualizarTabela(lista) {
+    if (!lista.length) {
+      listaEl.innerHTML = '<tr><td colspan="5" style="color:var(--gray);text-align:center;padding:24px;">Nenhum cliente encontrado.</td></tr>';
+      contadorEl.textContent = '0 clientes';
+      return;
+    }
+
+    contadorEl.textContent = lista.length + (lista.length === 1 ? ' cliente' : ' clientes');
+
+    listaEl.innerHTML = '';
+    lista.forEach((c) => {
+      const whatsLink = c.telefone
+        ? `https://wa.me/55${c.telefone.replace(/\\D/g,'')}`
+        : null;
+
+      listaEl.innerHTML += `
+        <tr>
+          <td><strong>${c.nome || ''}</strong></td>
+          <td>${c.telefone || '<span style="color:var(--gray)">-</span>'}</td>
+          <td>${c.email    || '<span style="color:var(--gray)">-</span>'}</td>
+          <td>${c.cpf      || '<span style="color:var(--gray)">-</span>'}</td>
+          <td>
+            <div class="acoes">
+              ${whatsLink ? `
+                <a class="btn btn-primary btn-sm" href="${whatsLink}" target="_blank" title="WhatsApp">
+                  <i class="fab fa-whatsapp"></i>
+                </a>` : ''
+              }
+              <button class="btn btn-primary btn-sm" onclick="editarCliente('${c.id}')">
+                <i class="fas fa-edit"></i>
+              </button>
+              <button class="btn btn-danger btn-sm" onclick="excluirCliente('${c.id}', '${(c.nome || '').replace(/'/g,"\\'")}')">
+                <i class="fas fa-trash"></i>
+              </button>
+            </div>
+          </td>
+        </tr>`;
+    });
+  }
+
+  // Editar – por enquanto só abre um prompt simples (mantém funcionalidade básica)
+  window.editarCliente = async (id) => {
+    const cliente = todosClientes.find(c => c.id === id);
+    if (!cliente) return;
+
+    const novoNome = prompt('Nome do cliente:', cliente.nome || '');
+    if (novoNome === null) return;
+
+    try {
+      await updateDoc(doc(db, 'clientes', id), { nome: novoNome });
       mostrarMensagem('Cliente atualizado com sucesso!');
-      modalOverlay.classList.remove('ativo');
-      clienteEditandoId = null;
     } catch (error) {
       console.error(error);
       mostrarMensagem('Erro ao atualizar cliente.', 'erro');
     }
-  });
+  };
 
   window.excluirCliente = async (id, nome) => {
     if (!confirm(`Excluir o cliente "${nome}"?`)) return;
