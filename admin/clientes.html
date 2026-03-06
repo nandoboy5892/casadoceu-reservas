@@ -86,6 +86,9 @@
     }
     .btn-outline:hover { background: var(--primary); color: var(--white); }
 
+    .btn-success { background: #25d366; color: var(--white); }
+    .btn-success:hover { background: #1da851; transform: translateY(-2px); }
+
     .btn-danger { background: #dc3545; color: var(--white); }
     .btn-danger:hover { background: #b02a37; transform: translateY(-2px); }
 
@@ -167,7 +170,7 @@
       color: var(--dark);
     }
 
-    input, textarea {
+    input, textarea, select {
       padding: 10px 12px;
       border: 1px solid #dee2e6;
       border-radius: 8px;
@@ -179,7 +182,7 @@
       outline: none;
     }
 
-    input:focus, textarea:focus {
+    input:focus, textarea:focus, select:focus {
       border-color: var(--primary);
       background: var(--white);
       box-shadow: 0 0 0 3px rgba(0,119,204,0.12);
@@ -201,12 +204,19 @@
     #mensagem.sucesso { background: #d1e7dd; color: #0a3622; display: block; }
     #mensagem.erro    { background: #f8d7da; color: #58151c; display: block; }
 
-    /* Barra de busca / contador */
+    /* Toolbar */
     .list-toolbar {
       display: flex;
       justify-content: space-between;
       align-items: center;
-      margin-bottom: 14px;
+      margin-bottom: 16px;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .toolbar-left {
+      display: flex;
+      align-items: center;
       gap: 12px;
       flex-wrap: wrap;
     }
@@ -214,12 +224,12 @@
     .contador {
       font-size: 0.85rem;
       color: var(--gray);
+      font-weight: 600;
     }
 
     .search-box {
       position: relative;
-      max-width: 260px;
-      width: 100%;
+      width: 260px;
     }
 
     .search-box input {
@@ -236,6 +246,15 @@
       font-size: 0.85rem;
     }
 
+    select {
+      padding: 8px 12px;
+      font-size: 0.85rem;
+      cursor: pointer;
+    }
+
+    /* Tabela */
+    .table-wrapper { overflow-x: auto; }
+
     table {
       width: 100%;
       border-collapse: collapse;
@@ -249,15 +268,66 @@
       text-align: left;
       font-family: 'Montserrat', sans-serif;
       font-weight: 600;
+      cursor: pointer;
+      user-select: none;
+      white-space: nowrap;
     }
 
     th:first-child { border-radius: 8px 0 0 0; }
     th:last-child  { border-radius: 0 8px 0 0; }
 
-    td { padding: 12px 14px; border-bottom: 1px solid #f0f0f0; }
-    tr:hover td { background: #f8f9fa; }
+    th i.sort-icon { margin-left: 4px; font-size: 0.75rem; opacity: 0.7; }
 
-    .acoes { display: flex; gap: 6px; }
+    td { padding: 12px 14px; border-bottom: 1px solid #f0f0f0; vertical-align: middle; }
+    tr:hover td { background: #f0f6fc; }
+
+    .acoes { display: flex; gap: 6px; flex-wrap: wrap; }
+
+    .obs-texto {
+      font-size: 0.8rem;
+      color: var(--gray);
+      margin-top: 4px;
+      font-style: italic;
+    }
+
+    /* Paginação */
+    .paginacao {
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      gap: 8px;
+      margin-top: 20px;
+      flex-wrap: wrap;
+    }
+
+    .paginacao button {
+      padding: 6px 14px;
+      border-radius: 50px;
+      border: 2px solid var(--primary);
+      background: transparent;
+      color: var(--primary);
+      font-family: 'Quicksand', sans-serif;
+      font-weight: 600;
+      font-size: 0.82rem;
+      cursor: pointer;
+      transition: var(--transition);
+    }
+
+    .paginacao button:hover,
+    .paginacao button.ativo {
+      background: var(--primary);
+      color: var(--white);
+    }
+
+    .paginacao button:disabled {
+      opacity: 0.4;
+      cursor: not-allowed;
+    }
+
+    .paginacao-info {
+      font-size: 0.82rem;
+      color: var(--gray);
+    }
 
     .user-badge {
       background: rgba(0,119,204,0.08);
@@ -268,11 +338,61 @@
       font-weight: 600;
     }
 
-    @media (max-width: 600px) {
+    /* Modal */
+    .modal-overlay {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.5);
+      z-index: 999;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+    }
+
+    .modal-overlay.ativo { display: flex; }
+
+    .modal {
+      background: var(--white);
+      border-radius: 12px;
+      padding: 32px 28px;
+      width: 100%;
+      max-width: 560px;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+      animation: fadeInUp 0.3s ease;
+      max-height: 90vh;
+      overflow-y: auto;
+    }
+
+    .modal h2 {
+      font-family: 'Montserrat', sans-serif;
+      font-weight: 700;
+      font-size: 1.1rem;
+      color: var(--primary);
+      margin-bottom: 20px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .modal-botoes {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      margin-top: 24px;
+    }
+
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    @media (max-width: 700px) {
       .form-grid { grid-template-columns: 1fr; }
       nav { padding: 1rem; }
       .container { padding: 24px 16px; }
-      .page-header { flex-direction: column; }
+      .search-box { width: 100%; }
+      .list-toolbar { flex-direction: column; align-items: flex-start; }
     }
   </style>
 </head>
@@ -305,7 +425,7 @@
 
   <div id="mensagem"></div>
 
-  <!-- Formulário -->
+  <!-- Formulário novo cliente -->
   <div class="card">
     <h2><i class="fas fa-user-plus"></i> Novo Cliente</h2>
     <form id="formCliente">
@@ -339,34 +459,81 @@
     </form>
   </div>
 
-  <!-- Lista -->
+  <!-- Lista de clientes -->
   <div class="card">
     <h2><i class="fas fa-users"></i> Clientes Cadastrados</h2>
 
     <div class="list-toolbar">
-      <span class="contador" id="contadorClientes">0 clientes</span>
+      <div class="toolbar-left">
+        <span class="contador" id="contadorClientes">0 clientes</span>
+        <select id="ordenacao">
+          <option value="criadoEm_desc">Mais recentes</option>
+          <option value="criadoEm_asc">Mais antigos</option>
+          <option value="nome_asc">Nome A → Z</option>
+          <option value="nome_desc">Nome Z → A</option>
+        </select>
+      </div>
       <div class="search-box">
         <i class="fas fa-search"></i>
         <input type="text" id="busca" placeholder="Buscar por nome, telefone ou e-mail">
       </div>
     </div>
 
-    <table>
-      <thead>
-        <tr>
-          <th>Nome</th>
-          <th>Telefone</th>
-          <th>E-mail</th>
-          <th>CPF</th>
-          <th>Ações</th>
-        </tr>
-      </thead>
-      <tbody id="listaClientes">
-        <tr><td colspan="5" style="color:var(--gray); text-align:center; padding:24px;">Carregando...</td></tr>
-      </tbody>
-    </table>
+    <div class="table-wrapper">
+      <table>
+        <thead>
+          <tr>
+            <th>Nome</th>
+            <th>Telefone</th>
+            <th>E-mail</th>
+            <th>CPF</th>
+            <th>Ações</th>
+          </tr>
+        </thead>
+        <tbody id="listaClientes">
+          <tr><td colspan="5" style="color:var(--gray);text-align:center;padding:24px;">Carregando...</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="paginacao" id="paginacao"></div>
   </div>
 
+</div>
+
+<!-- Modal de edição -->
+<div class="modal-overlay" id="modalOverlay">
+  <div class="modal">
+    <h2><i class="fas fa-user-edit"></i> Editar Cliente</h2>
+    <div class="form-grid">
+      <div class="form-group form-full">
+        <label>Nome completo *</label>
+        <input type="text" id="editNome" placeholder="Nome do cliente">
+      </div>
+      <div class="form-group">
+        <label>Telefone *</label>
+        <input type="tel" id="editTelefone" placeholder="(31) 99999-9999">
+      </div>
+      <div class="form-group">
+        <label>E-mail</label>
+        <input type="email" id="editEmail" placeholder="email@exemplo.com">
+      </div>
+      <div class="form-group">
+        <label>CPF</label>
+        <input type="text" id="editCpf" placeholder="000.000.000-00">
+      </div>
+      <div class="form-group form-full">
+        <label>Observações</label>
+        <textarea id="editObservacoes" placeholder="Alergias, preferências, informações importantes..."></textarea>
+      </div>
+    </div>
+    <div class="modal-botoes">
+      <button class="btn btn-outline" id="btnCancelarEdicao">Cancelar</button>
+      <button class="btn btn-primary" id="btnSalvarEdicao">
+        <i class="fas fa-save"></i> Salvar alterações
+      </button>
+    </div>
+  </div>
 </div>
 
 <script type="module">
@@ -377,13 +544,20 @@
     doc, updateDoc, deleteDoc
   } from "https://www.gstatic.com/firebasejs/10.8.0/firebase-firestore.js";
 
-  const mensagemEl   = document.getElementById('mensagem');
-  const listaEl      = document.getElementById('listaClientes');
-  const formEl       = document.getElementById('formCliente');
-  const buscaEl      = document.getElementById('busca');
-  const contadorEl   = document.getElementById('contadorClientes');
+  const mensagemEl    = document.getElementById('mensagem');
+  const listaEl       = document.getElementById('listaClientes');
+  const formEl        = document.getElementById('formCliente');
+  const buscaEl       = document.getElementById('busca');
+  const contadorEl    = document.getElementById('contadorClientes');
+  const ordenacaoEl   = document.getElementById('ordenacao');
+  const paginacaoEl   = document.getElementById('paginacao');
+  const modalOverlay  = document.getElementById('modalOverlay');
 
-  let todosClientes = [];   // array com todos os clientes do Firestore
+  let todosClientes       = [];
+  let clienteEditandoId   = null;
+
+  const POR_PAGINA = 10;
+  let paginaAtual  = 1;
 
   // Protege página
   onAuthStateChanged(auth, (user) => {
@@ -408,22 +582,23 @@
     e.preventDefault();
     try {
       await addDoc(collection(db, 'clientes'), {
-        nome:         document.getElementById('nome').value,
-        telefone:     document.getElementById('telefone').value,
-        email:        document.getElementById('emailCliente').value,
-        cpf:          document.getElementById('cpf').value,
-        observacoes:  document.getElementById('observacoes').value,
-        criadoEm:     new Date()
+        nome:        document.getElementById('nome').value.trim(),
+        telefone:    document.getElementById('telefone').value.trim(),
+        email:       document.getElementById('emailCliente').value.trim(),
+        cpf:         document.getElementById('cpf').value.trim(),
+        observacoes: document.getElementById('observacoes').value.trim(),
+        criadoEm:    new Date()
       });
       mostrarMensagem('Cliente salvo com sucesso!');
       formEl.reset();
+      paginaAtual = 1;
     } catch (error) {
       console.error(error);
       mostrarMensagem('Erro ao salvar cliente.', 'erro');
     }
   });
 
-  // Carregar clientes e manter em memória
+  // Carregar do Firestore
   function carregarClientes() {
     const q = query(collection(db, 'clientes'), orderBy('criadoEm', 'desc'));
     onSnapshot(q, (snapshot) => {
@@ -431,92 +606,157 @@
       snapshot.forEach((docSnap) => {
         todosClientes.push({ id: docSnap.id, ...docSnap.data() });
       });
-      aplicarFiltroEAtualizarLista();
+      paginaAtual = 1;
+      renderizar();
     });
   }
 
-  // Filtro de busca
-  buscaEl.addEventListener('input', () => {
-    aplicarFiltroEAtualizarLista();
-  });
+  // Filtro + ordenação + paginação
+  buscaEl.addEventListener('input',    () => { paginaAtual = 1; renderizar(); });
+  ordenacaoEl.addEventListener('change', () => { paginaAtual = 1; renderizar(); });
 
-  function aplicarFiltroEAtualizarLista() {
-    const termo = buscaEl.value.trim().toLowerCase();
+  function renderizar() {
+    const termo  = buscaEl.value.trim().toLowerCase();
+    const [campo, dir] = ordenacaoEl.value.split('_');
 
-    let filtrados = todosClientes;
+    // 1. Filtrar
+    let lista = todosClientes.filter((c) => {
+      if (!termo) return true;
+      return (
+        (c.nome      || '').toLowerCase().includes(termo) ||
+        (c.telefone  || '').toLowerCase().includes(termo) ||
+        (c.email     || '').toLowerCase().includes(termo)
+      );
+    });
 
-    if (termo) {
-      filtrados = todosClientes.filter((c) => {
-        const nome = (c.nome || '').toLowerCase();
-        const tel  = (c.telefone || '').toLowerCase();
-        const mail = (c.email || '').toLowerCase();
-        return (
-          nome.includes(termo) ||
-          tel.includes(termo)  ||
-          mail.includes(termo)
-        );
-      });
-    }
+    // 2. Ordenar
+    lista.sort((a, b) => {
+      let va = a[campo] || '';
+      let vb = b[campo] || '';
+      if (campo === 'criadoEm') {
+        va = a.criadoEm?.toDate ? a.criadoEm.toDate() : new Date(a.criadoEm);
+        vb = b.criadoEm?.toDate ? b.criadoEm.toDate() : new Date(b.criadoEm);
+      }
+      if (va < vb) return dir === 'asc' ? -1 : 1;
+      if (va > vb) return dir === 'asc' ? 1 : -1;
+      return 0;
+    });
 
-    atualizarTabela(filtrados);
-  }
+    // 3. Contador
+    contadorEl.textContent = lista.length + (lista.length === 1 ? ' cliente' : ' clientes');
 
-  function atualizarTabela(lista) {
-    if (!lista.length) {
+    // 4. Paginar
+    const total  = lista.length;
+    const inicio = (paginaAtual - 1) * POR_PAGINA;
+    const fim    = inicio + POR_PAGINA;
+    const pagina = lista.slice(inicio, fim);
+
+    // 5. Renderizar tabela
+    if (!pagina.length) {
       listaEl.innerHTML = '<tr><td colspan="5" style="color:var(--gray);text-align:center;padding:24px;">Nenhum cliente encontrado.</td></tr>';
-      contadorEl.textContent = '0 clientes';
+      paginacaoEl.innerHTML = '';
       return;
     }
 
-    contadorEl.textContent = lista.length + (lista.length === 1 ? ' cliente' : ' clientes');
-
     listaEl.innerHTML = '';
-    lista.forEach((c) => {
-      const whatsLink = c.telefone
-        ? `https://wa.me/55${c.telefone.replace(/\\D/g,'')}`
-        : null;
+    pagina.forEach((c) => {
+      const fone = (c.telefone || '').replace(/\D/g, '');
+      const whatsLink = fone ? `https://wa.me/55${fone}` : null;
 
       listaEl.innerHTML += `
         <tr>
-          <td><strong>${c.nome || ''}</strong></td>
+          <td>
+            <strong>${c.nome || ''}</strong>
+            ${c.observacoes ? `<div class="obs-texto"><i class="fas fa-sticky-note"></i> ${c.observacoes}</div>` : ''}
+          </td>
           <td>${c.telefone || '<span style="color:var(--gray)">-</span>'}</td>
           <td>${c.email    || '<span style="color:var(--gray)">-</span>'}</td>
           <td>${c.cpf      || '<span style="color:var(--gray)">-</span>'}</td>
           <td>
             <div class="acoes">
               ${whatsLink ? `
-                <a class="btn btn-primary btn-sm" href="${whatsLink}" target="_blank" title="WhatsApp">
+                <a class="btn btn-success btn-sm" href="${whatsLink}" target="_blank" title="Abrir WhatsApp">
                   <i class="fab fa-whatsapp"></i>
-                </a>` : ''
-              }
-              <button class="btn btn-primary btn-sm" onclick="editarCliente('${c.id}')">
-                <i class="fas fa-edit"></i>
+                </a>` : ''}
+              <button class="btn btn-primary btn-sm" onclick="abrirEdicao('${c.id}')">
+                <i class="fas fa-edit"></i> Editar
               </button>
-              <button class="btn btn-danger btn-sm" onclick="excluirCliente('${c.id}', '${(c.nome || '').replace(/'/g,"\\'")}')">
+              <button class="btn btn-danger btn-sm" onclick="excluirCliente('${c.id}', '${(c.nome || '').replace(/'/g, "\\'")}')">
                 <i class="fas fa-trash"></i>
               </button>
             </div>
           </td>
         </tr>`;
     });
+
+    // 6. Renderizar paginação
+    const totalPaginas = Math.ceil(total / POR_PAGINA);
+    paginacaoEl.innerHTML = '';
+
+    if (totalPaginas <= 1) return;
+
+    const btnAnterior = document.createElement('button');
+    btnAnterior.innerHTML = '<i class="fas fa-chevron-left"></i>';
+    btnAnterior.disabled = paginaAtual === 1;
+    btnAnterior.addEventListener('click', () => { paginaAtual--; renderizar(); });
+    paginacaoEl.appendChild(btnAnterior);
+
+    for (let i = 1; i <= totalPaginas; i++) {
+      const btn = document.createElement('button');
+      btn.textContent = i;
+      if (i === paginaAtual) btn.classList.add('ativo');
+      btn.addEventListener('click', () => { paginaAtual = i; renderizar(); });
+      paginacaoEl.appendChild(btn);
+    }
+
+    const btnProximo = document.createElement('button');
+    btnProximo.innerHTML = '<i class="fas fa-chevron-right"></i>';
+    btnProximo.disabled = paginaAtual === totalPaginas;
+    btnProximo.addEventListener('click', () => { paginaAtual++; renderizar(); });
+    paginacaoEl.appendChild(btnProximo);
+
+    const info = document.createElement('span');
+    info.className = 'paginacao-info';
+    info.textContent = `Página ${paginaAtual} de ${totalPaginas}`;
+    paginacaoEl.appendChild(info);
   }
 
-  // Editar – por enquanto só abre um prompt simples (mantém funcionalidade básica)
-  window.editarCliente = async (id) => {
+  // Abrir modal de edição
+  window.abrirEdicao = (id) => {
     const cliente = todosClientes.find(c => c.id === id);
     if (!cliente) return;
+    clienteEditandoId = id;
+    document.getElementById('editNome').value        = cliente.nome        || '';
+    document.getElementById('editTelefone').value    = cliente.telefone    || '';
+    document.getElementById('editEmail').value       = cliente.email       || '';
+    document.getElementById('editCpf').value         = cliente.cpf         || '';
+    document.getElementById('editObservacoes').value = cliente.observacoes || '';
+    modalOverlay.classList.add('ativo');
+  };
 
-    const novoNome = prompt('Nome do cliente:', cliente.nome || '');
-    if (novoNome === null) return;
+  document.getElementById('btnCancelarEdicao').addEventListener('click', () => {
+    modalOverlay.classList.remove('ativo');
+    clienteEditandoId = null;
+  });
 
+  document.getElementById('btnSalvarEdicao').addEventListener('click', async () => {
+    if (!clienteEditandoId) return;
     try {
-      await updateDoc(doc(db, 'clientes', id), { nome: novoNome });
+      await updateDoc(doc(db, 'clientes', clienteEditandoId), {
+        nome:        document.getElementById('editNome').value.trim(),
+        telefone:    document.getElementById('editTelefone').value.trim(),
+        email:       document.getElementById('editEmail').value.trim(),
+        cpf:         document.getElementById('editCpf').value.trim(),
+        observacoes: document.getElementById('editObservacoes').value.trim(),
+      });
       mostrarMensagem('Cliente atualizado com sucesso!');
+      modalOverlay.classList.remove('ativo');
+      clienteEditandoId = null;
     } catch (error) {
       console.error(error);
       mostrarMensagem('Erro ao atualizar cliente.', 'erro');
     }
-  };
+  });
 
   window.excluirCliente = async (id, nome) => {
     if (!confirm(`Excluir o cliente "${nome}"?`)) return;
